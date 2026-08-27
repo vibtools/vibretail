@@ -1,0 +1,34 @@
+<?php
+declare(strict_types=1);
+if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI access only.'); }
+putenv('POS_SERVICE_CREDENTIAL_KEY=base64:' . base64_encode(str_repeat('K',32)));
+$_ENV['POS_SERVICE_CREDENTIAL_KEY']='base64:' . base64_encode(str_repeat('K',32));
+require dirname(__DIR__, 2) . '/src/config.php';
+$repoRoot=dirname(__DIR__, 2);$root=$repoRoot.'/src'; $fail=[]; $pass=[];
+$check=static function(string $name,bool $condition) use (&$fail,&$pass):void { if ($condition) { $pass[]=$name; } else { $fail[]=$name; } };
+$api=(string)file_get_contents($root.'/api.php');
+$check('api.php starts with PHP tag',str_starts_with($api,'<?php'));
+$map=api_action_permission_map();
+$check('RBAC action map covers baseline 70 actions plus credential reveal',count($map)===71 && isset($map['transfer_save'],$map['service_credential_reveal'],$map['backup']));
+$check('High-risk permissions are explicit',$map['transfer_save']==='bank.transfer' && $map['account_save']==='bank.accounts_manage' && $map['backup']==='admin.backup' && $map['user_save']==='admin.users');
+$check('RBAC delegation ceiling is enforced', str_contains($api, 'PERMISSION_DELEGATION_DENIED') && str_contains($api, "Administrator is a reserved built-in role."));
+$check('Non-admin role all token is stripped', permissions_are_delegable(['admin.roles'], ['all']) === false);
+$check('Normal services response does not SELECT s.*',!preg_match('/SELECT\s+s\.\*[^;]+FROM\s+services\s+s/i',$api) && str_contains($api,'credential_protection'));
+$check('Terminal service status purges stored credential', str_contains($api, "device_password=IF(?,NULL,device_password)"));
+$check('Browser backup service projection matches schema and omits credential', str_contains($api, 'SELECT id,service_no,customer_id,technician_id,device,issue,serial_no,device_condition,technician_notes,status,amount,paid,service_charge,refund,received_date,delivery_date,note,created_at FROM services'));
+$plain='4829-test'; $enc=encrypt_service_credential($plain); $check('Service credential encrypt/decrypt round-trip',str_starts_with($enc,'enc:v1:') && decrypt_service_credential($enc)===$plain && !str_contains($enc,$plain));
+$apache=(string)file_get_contents($root.'/.htaccess'); $nginx=(string)file_get_contents($root.'/aapanel-nginx.conf');
+foreach(['error_log','zip','7z','tar','tgz'] as $needle) $check("Sensitive web deny contains {$needle}",str_contains($apache,$needle)&&str_contains($nginx,$needle));
+$images=(string)file_get_contents($root.'/product-images.php');
+$check('Image upload decode/re-encode path exists',str_contains($images,'imagecreatefromstring') && str_contains($images,'imagejpeg') && str_contains($images,'PRODUCT_IMAGE_MAX_PIXELS'));
+$install=(string)file_get_contents($root.'/install.php');
+$check('Installer is one-time state locked',str_contains($install,'installer_state()') && str_contains($install,'installer_perform_fresh_install') && str_contains((string)file_get_contents($root.'/installer-lib.php'),'installer_write_lock'));
+$check('Installer has no hardcoded password hash literal', preg_match('/password_hash\s*\(\s*[\'"][^\'"]+/i', $install) !== 1);
+$setup=(string)file_get_contents($root.'/aapanel-setup.php');
+$check('aaPanel setup preserves encryption key on re-run', str_contains($setup, "setup_existing_env_value(\$target, 'POS_SERVICE_CREDENTIAL_KEY')"));
+$check('aaPanel setup forces production environment', str_contains($setup, "'POS_APP_ENV=production'") && str_contains($setup, "'POS_ALLOW_WEB_INSTALL=false'"));
+foreach($pass as $name) echo "[PASS] {$name}\n";
+foreach($fail as $name) fwrite(STDERR,"[FAIL] {$name}\n");
+if($fail) exit(1);
+if(!extension_loaded('gd')) echo "[ENV] GD runtime test not executed in this audit container; deployment preflight must require ext-gd and ext-exif.\n";
+exit(0);

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://schema.ygit.dev/vpms/v2/vibproject.schema.json",
+  "schemaVersion": 2,
+  "manifestVersion": "2.0.0",
+  "project": {
+    "id": "vibretail",
+    "name": "vibretail",
+    "slug": "vibretail",
+    "displayName": "VibRetail",
+    "description": "VibProject-structured modernization workspace for the current retail/POS application baseline.",
+    "summary": "Retail operations application repository organized under the Vib Tools VibProject standard.",
+    "version": "0.1.0-dev.1",
+    "status": "development",
+    "visibility": "private",
+    "category": "retail-operations",
+    "keywords": [
+      "retail",
+      "pos",
+      "inventory",
+      "sales",
+      "purchases",
+      "vib-tools"
+    ],
+    "homepage": "https://vib.tools/",
+    "website": "https://github.com/vibtools/vibretail"
+  },
+  "classification": {
+    "ownerType": "organization",
+    "productType": "application",
+    "applicationType": "web-application",
+    "distribution": "source-available",
+    "lifecycle": "development"
+  },
+  "organization": {
+    "company": "Vib Tools",
+    "owner": "Vib Tools",
+    "maintainers": [
+      "Vib Tools Core Team"
+    ],
+    "contributors": [],
+    "contact": {
+      "email": "opensource@vib.tools",
+      "website": "https://vib.tools/"
+    }
+  },
+  "repository": {
+    "provider": "GitHub",
+    "url": "https://github.com/vibtools/vibretail",
+    "branch": "main",
+    "defaultBranch": "main",
+    "issues": "https://github.com/vibtools/vibretail/issues",
+    "documentation": "https://docs.vib.tools/"
+  },
+  "links": {
+    "website": "https://vib.tools/",
+    "documentation": "https://docs.vib.tools/",
+    "github": "https://github.com/vibtools/vibretail"
+  },
+  "branding": {
+    "productName": "VibRetail",
+    "shortName": "VR",
+    "theme": "system",
+    "runtimeBrandTransition": "pending-license-authorization"
+  },
+  "license": {
+    "name": "Cloud Core POS Free Non-Commercial Attribution License 1.0",
+    "spdx": "LicenseRef-Cloud-Core-POS-NC-Attribution-1.0",
+    "file": "LICENSE"
+  },
+  "entrypoints": {
+    "application": "src/index.php",
+    "installer": "src/install.php",
+    "documentation": "README.md",
+    "tests": "tests/"
+  },
+  "paths": {
+    "source": "src/",
+    "tests": "tests/",
+    "documentation": "docs/",
+    "scripts": "scripts/",
+    "assets": "assets/",
+    "examples": "examples/",
+    "configuration": "config/",
+    "data": "data/",
+    "project": "project/"
+  },
+  "dependencies": {
+    "required": [
+      "PHP >= 8.1",
+      "PDO MySQL",
+      "mbstring",
+      "OpenSSL",
+      "JSON",
+      "GD",
+      "EXIF"
+    ],
+    "optional": [],
+    "externalServices": [
+      "MySQL/MariaDB"
+    ]
+  },
+  "documentation": {
+    "readme": "README.md",
+    "structure": "PROJECT_STRUCTURE.md",
+    "changelog": "CHANGELOG.md",
+    "license": "LICENSE",
+    "docsRoot": "docs/",
+    "website": "https://docs.vib.tools/"
+  },
+  "support": {
+    "email": "opensource@vib.tools",
+    "documentation": "https://docs.vib.tools/",
+    "issues": "https://github.com/vibtools/vibretail/issues"
+  },
+  "release": {
+    "versioning": "Semantic Versioning",
+    "latestVersion": "0.1.0-dev.1",
+    "releaseNotes": "docs/release-notes/"
+  },
+  "ai": {
+    "enabled": true,
+    "repositoryContext": true,
+    "documentationContext": true,
+    "projectStructure": true,
+    "codingGuidelines": true,
+    "architectureGuidelines": true,
+    "entrypointDiscovery": true
+  },
+  "metadata": {
+    "manifestAuthor": "Vib Tools",
+    "generator": "VibRetail template migration",
+    "specification": "VPMS",
+    "specificationVersion": "2.0.0"
+  }
+}

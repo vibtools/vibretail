@@ -1,0 +1,29 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} ^(?:TRACE|TRACK)$ [NC]
+    RewriteRule ^ - [R=405,L]
+    RewriteCond %{HTTP_HOST} !^[A-Za-z0-9.-]+(?::[0-9]+)?$ [NC]
+    RewriteRule ^ - [R=400,L]
+
+    # Local XAMPP remains HTTP; every non-local deployment is HTTPS-only.
+    # This must run before the internal /install rewrite so installer credentials
+    # can never be submitted over cleartext HTTP on a public host.
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP_HOST} !^(?:localhost|127\.0\.0\.1)(?::[0-9]+)?$ [NC]
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # Friendly one-time installer route. install.php enforces its own installation lock.
+    RewriteRule ^install/?$ install.php [L,QSA,NC]
+
+    # Block hidden/internal paths except ACME challenge validation.
+    RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
+    RewriteRule ^(?:tools|migrations|storage/private)(?:/|$) - [F,L,NC]
+</IfModule>
+
+<FilesMatch "^(?:error_log|config\.php|installer-lib\.php|migrations\.php|product-images\.php|schema\.sql|backup\.php|restore\.php|uat\.php|migrate-product-images\.php|aapanel-setup\.php|aapanel-nginx\.conf|htdocs\.rar)$|\.(?:sql|log|bak|ini|env|rar|conf|zip|7z|tar|gz|tgz)$">
+    Require all denied
+</FilesMatch>
+
+LimitRequestBody 5000000

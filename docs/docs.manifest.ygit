@@ -1,0 +1,119 @@
+{
+  "$schema": "https://schema.ygit.dev/dpms/v1/docs.manifest.schema.json",
+  "schemaVersion": 1,
+  "manifestVersion": "1.0.0",
+  "documentation": {
+    "id": "vibretail",
+    "title": "VibRetail Documentation",
+    "description": "Public user documentation for VibRetail.",
+    "docsRoot": "docs/",
+    "defaultLanguage": "en",
+    "status": "draft",
+    "tags": [
+      "retail",
+      "pos",
+      "inventory",
+      "vib-tools"
+    ],
+    "defaultDocument": "index.md"
+  },
+  "discovery": {
+    "enabled": true,
+    "recursive": true,
+    "include": [
+      "**/*.md",
+      "**/*.mdx"
+    ],
+    "exclude": [
+      "media/**",
+      "**/README.md"
+    ],
+    "extensions": [
+      "md",
+      "mdx"
+    ],
+    "ignoreHidden": true,
+    "followSymlink": false
+  },
+  "structure": {
+    "autoGenerate": true,
+    "sort": "manual",
+    "maxDepth": 10,
+    "sections": [
+      {
+        "id": "getting-started",
+        "title": "Getting Started",
+        "path": "getting-started/",
+        "order": 1,
+        "hidden": false,
+        "collapsed": false
+      },
+      {
+        "id": "guides",
+        "title": "Guides",
+        "path": "guides/",
+        "order": 2,
+        "hidden": false,
+        "collapsed": false
+      },
+      {
+        "id": "features",
+        "title": "Features",
+        "path": "features/",
+        "order": 3,
+        "hidden": false,
+        "collapsed": false
+      },
+      {
+        "id": "configuration",
+        "title": "Configuration",
+        "path": "configuration/",
+        "order": 4,
+        "hidden": false,
+        "collapsed": false
+      },
+      {
+        "id": "api",
+        "title": "API Reference",
+        "path": "api/",
+        "order": 5,
+        "hidden": false,
+        "collapsed": true
+      },
+      {
+        "id": "faq",
+        "title": "FAQ",
+        "path": "faq/",
+        "order": 6,
+        "hidden": false,
+        "collapsed": true
+      },
+      {
+        "id": "troubleshooting",
+        "title": "Troubleshooting",
+        "path": "troubleshooting/",
+        "order": 7,
+        "hidden": false,
+        "collapsed": true
+      },
+      {
+        "id": "release-notes",
+        "title": "Release Notes",
+        "path": "release-notes/",
+        "order": 8,
+        "hidden": false,
+        "collapsed": true
+      }
+    ]
+  },
+  "versions": {
+    "enabled": false,
+    "current": "0.1.0-dev.1",
+    "latest": "0.1.0-dev.1",
+    "available": [
+      "0.1.0-dev.1"
+    ],
+    "strategy": "directory"
+  },
+  "custom": {}
+}

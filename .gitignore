@@ -1,0 +1,48 @@
+/project/
+# Local/private VibRetail development workspace - never publish
+# Local/private VibRetail development workspace - never publish
+# VibRetail / VibProject fresh-project policy
+
+# Active environment / secrets
+/src/.env
+/src/.env.windows
+/src/.env.server
+/src/.env.*
+!/src/.env.example
+!/src/.env.windows.example
+!/src/.env.aapanel.example
+
+# Runtime state
+/src/error_log
+/src/*.log
+/src/storage/private/installed.lock
+/src/storage/private/runtime/
+/src/uploads/products/*
+!/src/uploads/products/.gitkeep
+_runtime/
+_local-backups/
+_quarantine/
+
+# Backup/release artifacts
+*.bak
+*.rar
+*.zip
+*.7z
+*.tar
+*.gz
+*.tgz
+*.sql
+!/src/schema.sql
+pos-*.sql*
+database.sql
+DATABASE-CHECKSUM.txt
+/release/
+/dist/
+/build/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
