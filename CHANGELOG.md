@@ -25,3 +25,9 @@
 - Compacted the authenticated desktop sidebar to 196px, topbar to 44px, navigation rows to 30px and shell controls to 28px.
 - Flattened shell navigation/dropdown elevation, reduced navigation typography weight and tightened sidebar/topbar spacing.
 - Added locally anchored Quick Add/Profile dropdowns, responsive compact-shell rules and automated UI-02B visual-shell regression coverage.
+
+### Compact Core Content Components
+- Added an isolated `ui-components.css` layer for common authenticated page-content primitives while preserving the VibRetail palette.
+- Compacted operational page headers, generic panels, buttons, form fields, form grids, action bars and summary rows.
+- Replaced content-level hover lift, elevation and input focus glow with flat border/outline interaction states.
+- Added automated UI-03A regression coverage while leaving tables, dashboard cards, overlays and transaction layout composition for later gates.

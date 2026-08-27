@@ -16,5 +16,6 @@ echo [PASS] PHP syntax.
 "%PHPBIN%" tests\security\security-regression-ui-foundation.php || exit /b 1
 "%PHPBIN%" tests\security\security-regression-ui-shell.php || exit /b 1
 "%PHPBIN%" tests\security\security-regression-ui-shell-visual.php || exit /b 1
+"%PHPBIN%" tests\security\security-regression-ui-components.php || exit /b 1
 where node >nul 2>&1 && node --check src\app.js || echo [INFO] Node unavailable; JS syntax check skipped.
 echo [PASS] VibRetail repository static checks complete.

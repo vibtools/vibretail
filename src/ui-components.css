@@ -1,0 +1,275 @@
+/*
+ * VibRetail UI-03A — Compact core content components
+ * Structural reference: VibTools Web UI v2.1.2.
+ * Theme/color source of truth: existing VibRetail variables from style.css.
+ *
+ * Scope:
+ * - page headers;
+ * - generic panels;
+ * - buttons;
+ * - forms and summaries.
+ *
+ * Tables, dashboard cards, modals/toasts and transaction layout composition
+ * remain outside this gate.
+ */
+
+/* Page hierarchy ------------------------------------------------------------ */
+.app-view .page-header {
+    align-items: flex-end;
+    gap: var(--vr-space-6);
+    margin-bottom: var(--vr-space-7);
+}
+
+.app-view .page-header h1 {
+    margin: var(--vr-space-1) 0;
+    color: var(--ink);
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-tight);
+    letter-spacing: -.02em;
+}
+
+.app-view .page-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-regular);
+    line-height: var(--vr-line-normal);
+}
+
+.app-view .breadcrumb {
+    color: var(--green-dark);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-compact);
+    letter-spacing: .06em;
+}
+
+.app-view .header-actions {
+    gap: var(--vr-space-3);
+}
+
+/* Flat content surfaces ----------------------------------------------------- */
+.app-view .panel {
+    border: var(--vr-border-width) solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.app-view .panel-pad,
+.app-view .form-panel {
+    padding: var(--vr-space-6);
+}
+
+.app-view .two-column {
+    gap: var(--vr-grid-gap);
+}
+
+.app-view .section-title {
+    margin: 0 0 var(--vr-space-6);
+    color: var(--ink);
+    font-size: var(--vr-text-lg);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-compact);
+    letter-spacing: -.01em;
+}
+
+/* Buttons ------------------------------------------------------------------ */
+.app-view .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--vr-space-3);
+    min-height: var(--vr-button-medium);
+    padding: 0 var(--vr-space-5);
+    border-radius: var(--vr-radius-control);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+    line-height: 1;
+    transform: none;
+    transition:
+        color var(--vr-motion-normal),
+        background-color var(--vr-motion-normal),
+        border-color var(--vr-motion-normal),
+        opacity var(--vr-motion-normal);
+}
+
+.app-view .button:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.app-view .button-primary {
+    color: var(--surface);
+    background: var(--green);
+    box-shadow: none;
+}
+
+.app-view .button-primary:hover {
+    color: var(--surface);
+    background: var(--green-dark);
+}
+
+.app-view .button-secondary:hover {
+    color: var(--green-dark);
+    background: var(--green-soft);
+}
+
+.app-view .button-danger:hover {
+    color: var(--red);
+}
+
+.app-view .button-blue {
+    color: var(--surface);
+    background: var(--blue);
+    box-shadow: none;
+}
+
+.app-view .button:disabled,
+.app-view .button[aria-disabled="true"] {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Forms -------------------------------------------------------------------- */
+.app-view .form-grid {
+    gap: var(--vr-space-5);
+}
+
+.app-view .form-field {
+    gap: var(--vr-space-2);
+}
+
+.app-view .form-field label {
+    color: var(--ink);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-compact);
+}
+
+.app-view .form-field input,
+.app-view .form-field select,
+.app-view .form-field textarea {
+    min-height: var(--vr-input-medium);
+    padding: 0 var(--vr-space-4);
+    border: var(--vr-border-width) solid var(--line);
+    border-radius: var(--vr-radius-control);
+    color: var(--ink);
+    background: var(--surface);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-regular);
+    line-height: var(--vr-line-normal);
+    outline: none;
+    transition:
+        border-color var(--vr-motion-normal),
+        background-color var(--vr-motion-normal),
+        opacity var(--vr-motion-normal);
+}
+
+.app-view .form-field textarea {
+    min-height: var(--vr-textarea-min);
+    padding: var(--vr-space-3) var(--vr-space-4);
+}
+
+.app-view .form-field input:hover,
+.app-view .form-field select:hover,
+.app-view .form-field textarea:hover {
+    border-color: var(--muted);
+}
+
+.app-view .form-field input:focus,
+.app-view .form-field select:focus,
+.app-view .form-field textarea:focus {
+    border-color: var(--green);
+    box-shadow: none;
+    outline: 2px solid var(--green-soft);
+    outline-offset: 1px;
+}
+
+.app-view .form-field input:disabled,
+.app-view .form-field select:disabled,
+.app-view .form-field textarea:disabled,
+.app-view .form-field input[readonly],
+.app-view .form-field textarea[readonly] {
+    opacity: .62;
+}
+
+.app-view .form-field small {
+    color: var(--muted);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-regular);
+    line-height: var(--vr-line-normal);
+}
+
+.app-view .form-actions {
+    gap: var(--vr-space-4);
+    margin-top: var(--vr-space-6);
+    padding-top: var(--vr-space-6);
+}
+
+/* Summary surfaces ---------------------------------------------------------- */
+.app-view .record-summary {
+    gap: 0;
+}
+
+.app-view .summary-item {
+    padding: var(--vr-space-4) 0;
+}
+
+.app-view .summary-item span {
+    color: var(--muted);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-regular);
+}
+
+.app-view .summary-item strong {
+    color: var(--ink);
+    font-size: var(--vr-text-lg);
+    font-weight: var(--vr-weight-semibold);
+    line-height: var(--vr-line-compact);
+}
+
+/* Focus contract ------------------------------------------------------------ */
+.app-view :where(
+    .button,
+    .form-field input,
+    .form-field select,
+    .form-field textarea
+):focus-visible {
+    box-shadow: none;
+}
+
+/* Responsive content density ----------------------------------------------- */
+@media (max-width: 680px) {
+    .app-view .page-header {
+        gap: var(--vr-space-4);
+        margin-bottom: var(--vr-space-6);
+    }
+
+    .app-view .page-header h1 {
+        font-size: 18px;
+    }
+
+    .app-view .panel-pad,
+    .app-view .form-panel {
+        padding: var(--vr-space-5);
+    }
+
+    .app-view .form-grid {
+        gap: var(--vr-space-4);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-view .button,
+    .app-view .form-field input,
+    .app-view .form-field select,
+    .app-view .form-field textarea {
+        transition: none;
+    }
+}

@@ -17,6 +17,7 @@ $shellShowDeveloperCredit = $shellShowDeveloperCredit ?? true;
     <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?> | <?= htmlspecialchars($businessName, ENT_QUOTES, 'UTF-8') ?></title>
     <link rel="stylesheet" href="style.css?v=1.2.1">
     <link rel="stylesheet" href="ui-shell.css?v=1.0.0">
+    <link rel="stylesheet" href="ui-components.css?v=1.0.0">
 </head>
 <body class="app-view">
 <div id="app" class="app-shell">
