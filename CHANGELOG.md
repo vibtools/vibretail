@@ -19,3 +19,9 @@
 - Replaced 64 duplicated authenticated page shells with metadata-only route wrappers while preserving route filenames and page keys.
 - Preserved the existing shell DOM, `POS_CONFIG`, session/CSRF/auth-version behavior and current visual sizing for the UI-02A architecture gate.
 - Blocked direct HTTP access to internal `src/ui/` PHP source and added reusable-shell regression coverage.
+
+### Compact Application Shell
+- Added an isolated `ui-shell.css` visual layer that activates the UI-01 shell measurements without recoloring VibRetail.
+- Compacted the authenticated desktop sidebar to 196px, topbar to 44px, navigation rows to 30px and shell controls to 28px.
+- Flattened shell navigation/dropdown elevation, reduced navigation typography weight and tightened sidebar/topbar spacing.
+- Added locally anchored Quick Add/Profile dropdowns, responsive compact-shell rules and automated UI-02B visual-shell regression coverage.

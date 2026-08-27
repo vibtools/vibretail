@@ -16,6 +16,7 @@ $shellShowDeveloperCredit = $shellShowDeveloperCredit ?? true;
     <meta name="author" content="<?= htmlspecialchars(DEVELOPER_NAME, ENT_QUOTES, 'UTF-8') ?>">
     <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?> | <?= htmlspecialchars($businessName, ENT_QUOTES, 'UTF-8') ?></title>
     <link rel="stylesheet" href="style.css?v=1.2.1">
+    <link rel="stylesheet" href="ui-shell.css?v=1.0.0">
 </head>
 <body class="app-view">
 <div id="app" class="app-shell">
@@ -61,10 +62,14 @@ $shellShowDeveloperCredit = $shellShowDeveloperCredit ?? true;
             </div>
             <div class="topbar-actions">
                 <a class="outline-pill" href="sale-new.php" data-page="sale-new">Sale</a>
-                <button id="quick-add" class="outline-pill">+ Add New</button>
-                <div id="quick-menu" class="quick-menu"><a href="sale-new.php" data-page="sale-new">New Sale</a><a href="purchase-new.php" data-page="purchase-new">New Purchase</a><a href="product-new.php" data-page="product-new">New Product</a><a href="customer.php" data-page="customer">New Customer</a><a href="payment-center.php" data-page="payment-center">Payment</a><a href="buy-sms.php" data-page="buy-sms">Buy SMS</a></div>
-                <button id="profile-button" class="profile-button"><span><?php if (!empty($user['profile_photo'])): ?><img src="<?= htmlspecialchars($user['profile_photo'], ENT_QUOTES, 'UTF-8') ?>" alt="Profile photo"><?php else: ?><?= htmlspecialchars(strtoupper(substr($user['name'], 0, 1)), ENT_QUOTES, 'UTF-8') ?><?php endif; ?></span><i><?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></i></button>
-                <div id="profile-menu" class="profile-menu"><strong><?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></strong><small><?= htmlspecialchars($user['role'], ENT_QUOTES, 'UTF-8') ?></small><a href="profile.php" data-page="profile">View Profile</a><button id="logout-button">Logout</button></div>
+                <div class="topbar-menu-anchor">
+                    <button id="quick-add" class="outline-pill">+ Add New</button>
+                    <div id="quick-menu" class="quick-menu"><a href="sale-new.php" data-page="sale-new">New Sale</a><a href="purchase-new.php" data-page="purchase-new">New Purchase</a><a href="product-new.php" data-page="product-new">New Product</a><a href="customer.php" data-page="customer">New Customer</a><a href="payment-center.php" data-page="payment-center">Payment</a><a href="buy-sms.php" data-page="buy-sms">Buy SMS</a></div>
+                </div>
+                <div class="topbar-menu-anchor topbar-profile-anchor">
+                    <button id="profile-button" class="profile-button"><span><?php if (!empty($user['profile_photo'])): ?><img src="<?= htmlspecialchars($user['profile_photo'], ENT_QUOTES, 'UTF-8') ?>" alt="Profile photo"><?php else: ?><?= htmlspecialchars(strtoupper(substr($user['name'], 0, 1)), ENT_QUOTES, 'UTF-8') ?><?php endif; ?></span><i><?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></i></button>
+                    <div id="profile-menu" class="profile-menu"><strong><?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></strong><small><?= htmlspecialchars($user['role'], ENT_QUOTES, 'UTF-8') ?></small><a href="profile.php" data-page="profile">View Profile</a><button id="logout-button">Logout</button></div>
+                </div>
             </div>
         </header>
         <main id="content" class="content" tabindex="-1">

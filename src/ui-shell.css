@@ -1,0 +1,426 @@
+/*
+ * VibRetail UI-02B — Compact authenticated shell
+ * Structural reference: VibTools Web UI v2.1.2.
+ * Theme/color source of truth: existing VibRetail variables from style.css.
+ *
+ * Scope discipline:
+ * - authenticated shell only;
+ * - no page-content form/table/card redesign;
+ * - no foreign palette values;
+ * - no elevation/lift effects.
+ */
+
+:root {
+    --sidebar: var(--vr-sidebar-target);
+    --vr-shell-topbar: var(--vr-topbar-target);
+    --vr-shell-nav-row: 30px;
+    --vr-shell-nav-icon: 18px;
+    --vr-shell-control: 28px;
+}
+
+/* Desktop shell ------------------------------------------------------------- */
+.app-view .sidebar {
+    width: var(--sidebar);
+    box-shadow: none;
+    transition: transform var(--vr-motion-slow);
+}
+
+.app-view .sidebar-brand {
+    min-height: 44px;
+    height: 44px;
+    gap: var(--vr-space-4);
+    padding: var(--vr-space-3) var(--vr-space-5);
+}
+
+.app-view .sidebar-brand .brand-mark {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border-radius: var(--vr-radius-control);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .sidebar-brand strong {
+    font-size: var(--vr-text-base);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-tight);
+}
+
+.app-view .sidebar-brand small {
+    margin-top: 1px;
+    font-size: 10px;
+    font-weight: var(--vr-weight-regular);
+    line-height: var(--vr-line-tight);
+    letter-spacing: .04em;
+}
+
+.app-view .sidebar-nav {
+    padding: var(--vr-space-3) var(--vr-space-3) var(--vr-space-6);
+}
+
+.app-view .nav-link,
+.app-view .nav-parent {
+    min-height: var(--vr-shell-nav-row);
+    margin-bottom: var(--vr-space-1);
+    gap: 7px;
+    padding: var(--vr-space-2) var(--vr-space-3);
+    border-radius: var(--vr-radius-control);
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-compact);
+    transition:
+        color var(--vr-motion-normal),
+        background-color var(--vr-motion-normal),
+        border-color var(--vr-motion-normal);
+}
+
+.app-view .nav-link:hover,
+.app-view .nav-parent:hover {
+    color: var(--green-dark);
+    background: var(--green-soft);
+}
+
+.app-view .nav-link.active {
+    color: var(--surface);
+    background: var(--green);
+    box-shadow: none;
+}
+
+.app-view .nav-icon {
+    width: var(--vr-shell-nav-icon);
+    height: var(--vr-shell-nav-icon);
+    flex: 0 0 var(--vr-shell-nav-icon);
+    border-radius: var(--vr-radius-small);
+    color: var(--muted);
+    background: var(--canvas);
+    font-size: 7px;
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .nav-link.active .nav-icon {
+    color: var(--surface);
+    background: transparent;
+}
+
+.app-view .nav-parent b {
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-regular);
+    transition: transform var(--vr-motion-normal);
+}
+
+.app-view .nav-parent em,
+.app-view .nav-children em {
+    padding: 1px 4px;
+    border-radius: var(--vr-radius-small);
+    color: var(--surface);
+    background: var(--red);
+    font-size: 8px;
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .nav-group.open .nav-children {
+    padding: 1px 0 var(--vr-space-2) 29px;
+}
+
+.app-view .nav-children a {
+    min-height: 26px;
+    padding: 4px var(--vr-space-3);
+    border-left: 1px solid var(--line);
+    color: var(--muted);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-regular);
+    line-height: var(--vr-line-compact);
+}
+
+.app-view .nav-children a:hover,
+.app-view .nav-children a.active {
+    color: var(--green-dark);
+    border-left-color: var(--green);
+    background: var(--green-soft);
+}
+
+.app-view .sidebar-foot {
+    padding: var(--vr-space-4) var(--vr-space-5);
+    font-size: 10px;
+    line-height: var(--vr-line-compact);
+}
+
+.app-view .developer-credit {
+    gap: var(--vr-space-1);
+}
+
+.app-view .developer-credit .database-state,
+.app-view .developer-credit a {
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .developer-credit a {
+    overflow-wrap: anywhere;
+}
+
+.app-view .status-dot {
+    width: 6px;
+    height: 6px;
+    margin-right: var(--vr-space-2);
+}
+
+.app-view .workspace {
+    margin-left: var(--sidebar);
+}
+
+.app-view .topbar {
+    height: var(--vr-shell-topbar);
+    padding: 0 var(--vr-space-5);
+    background: var(--surface);
+    backdrop-filter: none;
+    box-shadow: none;
+}
+
+.app-view .topbar-left,
+.app-view .topbar-actions {
+    gap: var(--vr-space-3);
+}
+
+.app-view .icon-button {
+    width: var(--vr-shell-control);
+    height: var(--vr-shell-control);
+    border-radius: var(--vr-radius-control);
+    font-size: var(--vr-text-md);
+}
+
+.app-view .icon-button:hover {
+    background: var(--green-soft);
+}
+
+.app-view .system-pill {
+    height: var(--vr-shell-control);
+    gap: var(--vr-space-2);
+    padding: 0 var(--vr-space-4);
+    border-radius: var(--vr-radius-control);
+    background: var(--canvas);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .screen-icon {
+    width: 14px;
+    height: 10px;
+    border-color: var(--muted);
+}
+
+.app-view .language-select {
+    height: var(--vr-shell-control);
+    padding: 0 24px 0 var(--vr-space-4);
+    border-color: var(--line);
+    border-radius: var(--vr-radius-control);
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .support-text {
+    color: var(--green-dark);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .outline-pill {
+    min-width: 54px;
+    height: var(--vr-shell-control);
+    padding: 0 var(--vr-space-5);
+    border: 1px solid var(--green);
+    border-radius: var(--vr-radius-control);
+    color: var(--green-dark);
+    background: var(--surface);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+    line-height: 1;
+}
+
+.app-view .outline-pill:hover {
+    color: var(--surface);
+    background: var(--green);
+}
+
+.app-view .topbar-menu-anchor {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.app-view .quick-menu,
+.app-view .profile-menu {
+    top: calc(100% + var(--vr-space-2));
+    right: 0;
+    min-width: 164px;
+    padding: var(--vr-space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.app-view .quick-menu.open,
+.app-view .profile-menu.open {
+    animation: none;
+}
+
+.app-view .quick-menu a {
+    display: flex;
+    align-items: center;
+    min-height: 28px;
+    padding: var(--vr-space-2) var(--vr-space-3);
+    border-radius: var(--vr-radius-small);
+    color: var(--muted);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-regular);
+}
+
+.app-view .quick-menu a:hover {
+    color: var(--green-dark);
+    background: var(--green-soft);
+}
+
+.app-view .profile-button {
+    gap: var(--vr-space-2);
+    max-width: 118px;
+    min-height: var(--vr-shell-control);
+}
+
+.app-view .profile-button span {
+    width: var(--vr-shell-control);
+    height: var(--vr-shell-control);
+    flex: 0 0 var(--vr-shell-control);
+    color: var(--surface);
+    background: var(--ink);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .profile-button i {
+    color: var(--muted);
+    font-size: 11.5px;
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .profile-menu {
+    gap: var(--vr-space-1);
+    padding: var(--vr-space-3);
+}
+
+.app-view .profile-menu strong {
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .profile-menu small {
+    color: var(--muted);
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .profile-menu a,
+.app-view .profile-menu button {
+    min-height: 28px;
+    margin-top: var(--vr-space-2);
+    padding: var(--vr-space-2) var(--vr-space-3);
+    border-radius: var(--vr-radius-small);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .profile-menu a {
+    color: var(--green-dark);
+    background: var(--green-soft);
+}
+
+.app-view .profile-menu button {
+    color: var(--red);
+    background: var(--surface);
+    border: 1px solid var(--line);
+}
+
+.app-view .content {
+    height: calc(100vh - var(--vr-shell-topbar));
+}
+
+/* Shell focus contract ------------------------------------------------------- */
+.app-view :where(
+    .nav-link,
+    .nav-parent,
+    .icon-button,
+    .system-pill,
+    .language-select,
+    .outline-pill,
+    .quick-menu a,
+    .profile-button,
+    .profile-menu a,
+    .profile-menu button
+):focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+/* Responsive shell ---------------------------------------------------------- */
+@media (max-width: 980px) {
+    .app-view .sidebar {
+        width: var(--sidebar);
+        box-shadow: none;
+    }
+
+    .app-view .workspace {
+        margin-left: 0;
+    }
+
+    .app-view .menu-toggle,
+    .app-view .sidebar-close {
+        display: grid;
+    }
+
+    .app-view .support-text {
+        display: none;
+    }
+}
+
+@media (max-width: 680px) {
+    .app-view .topbar {
+        height: var(--vr-shell-topbar);
+        padding: 0 var(--vr-space-3);
+    }
+
+    .app-view .topbar-left,
+    .app-view .topbar-actions {
+        gap: var(--vr-space-2);
+    }
+
+    .app-view .content {
+        height: calc(100vh - var(--vr-shell-topbar));
+    }
+
+    .app-view .system-pill,
+    .app-view .language-select,
+    .app-view .profile-button i {
+        display: none;
+    }
+
+    .app-view .outline-pill {
+        min-width: auto;
+        height: var(--vr-shell-control);
+        padding: 0 var(--vr-space-4);
+        font-size: var(--vr-text-xs);
+    }
+
+    .app-view .profile-button {
+        max-width: var(--vr-shell-control);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-view .sidebar,
+    .app-view .nav-link,
+    .app-view .nav-parent,
+    .app-view .nav-parent b {
+        transition: none;
+    }
+}
