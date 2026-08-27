@@ -3,7 +3,7 @@ declare(strict_types=1);
 require dirname(__DIR__, 2) . '/src/config.php';
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI access only.'); }
 $withDb = in_array('--db',$argv,true); $required=['pdo_mysql','mbstring','openssl','json','gd','exif']; $failed=0;
-echo 'Cloud Core POS readiness check' . PHP_EOL;
+echo 'VibRetail readiness check' . PHP_EOL;
 echo 'PHP=' . PHP_VERSION . PHP_EOL;
 foreach ($required as $ext) { $ok=extension_loaded($ext); echo ($ok?'[PASS] ':'[FAIL] ') . 'extension ' . $ext . PHP_EOL; if(!$ok)$failed++; }
 $checks=[

@@ -120,11 +120,7 @@ foreach ($expectedPages as $file => [$key, $title, $subtitle, $section]) {
         && !str_contains($source, '<aside id="sidebar"')
         && !str_contains($source, 'window.POS_CONFIG');
 
-    if ($file === 'dashboard.php') {
-        $ok = $ok && str_contains($source, '$shellShowDeveloperCredit = false;');
-    } else {
-        $ok = $ok && !str_contains($source, '$shellShowDeveloperCredit = false;');
-    }
+    $ok = $ok && !str_contains($source, '$shellShowDeveloperCredit');
 
     shell_report($ok, 'Reusable wrapper ' . $file);
 }
@@ -146,7 +142,8 @@ $contextNeedles = [
     "session_unset();",
     "\$_SERVER['PHP_SELF']",
     "header('Location: index.php?return=' . rawurlencode(\$returnPage));",
-    "\$businessName = \$settings['business_name'] ?? SOFTWARE_NAME;",
+    "normalize_brand_settings(\$pdo->query('SELECT * FROM settings WHERE id = 1')->fetch() ?: [])",
+    "\$businessName = (string) (\$settings['business_name'] ?? SOFTWARE_NAME);",
 ];
 $contextOk = $context !== '';
 foreach ($contextNeedles as $needle) {
@@ -174,7 +171,6 @@ $shell = shell_read($shellPath);
 $shellNeedles = [
     "require __DIR__ . '/app-context.php';",
     "require __DIR__ . '/app-navigation.php';",
-    "\$shellShowDeveloperCredit = \$shellShowDeveloperCredit ?? true;",
     '<aside id="sidebar" class="sidebar">',
     'id="sidebar-close"',
     'id="sidebar-scrim"',
@@ -197,19 +193,24 @@ $shellNeedles = [
     "'initialPage' => \$pageKey",
     "'multiPage' => true",
     'style.css?v=1.2.1',
-    'app.js?v=1.5.0',
-    'DEVELOPER_FACEBOOK_URL',
-    'DEVELOPER_NAME',
+    'app.js?v=1.5.1',
     'DEVELOPER_COMPANY_URL',
-    'DEVELOPER_COMPANY',
-    'DEVELOPER_GITHUB_URL',
-    '<a href="license.php">License</a>',
+    'DEVELOPER_GITHUB_ORG_URL',
+    'DEVELOPER_LOGO_URL',
+    'DEVELOPER_WHATSAPP_URL',
+    'DEVELOPER_WHATSAPP_NUMBER',
+    'class="company-note"',
+    '<a href="about.php" data-page="about">About</a>',
 ];
 $shellOk = $shell !== '';
 foreach ($shellNeedles as $needle) {
     $shellOk = $shellOk && str_contains($shell, $needle);
 }
 shell_report($shellOk, 'Shared shell preserves DOM/POS_CONFIG/attribution contract');
+shell_report(
+    !str_contains($shell, '$shellShowDeveloperCredit') && !str_contains($shell, '<?php if ($shellShowDeveloperCredit): ?>'),
+    'Shared sidebar company/About footer is unconditional'
+);
 
 $noVisualCompaction = !str_contains($shell, '196px')
     && !str_contains($shell, '44px')

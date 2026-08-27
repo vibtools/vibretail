@@ -1,0 +1,2964 @@
+/*
+ * VibRetail Final UI Completion — VIBRETAIL-UI-COMPLETE-SL-001
+ * Structural reference: VibTools Web UI v2.1.2 official compact freeze.
+ * Color source of truth: VibRetail tokens from style.css.
+ *
+ * This is the authoritative remaining application UI layer.
+ * It completes dashboard, tables, overlays/states, transaction density,
+ * specialist surfaces, authentication/setup presentation and responsive polish.
+ *
+ * No VibTools palette values are imported.
+ */
+
+:root {
+    --vr-ui-control: 30px;
+    --vr-ui-action: 28px;
+    --vr-ui-row-action: 26px;
+    --vr-ui-toolbar: 30px;
+    --vr-ui-table-cell-y: 6px;
+    --vr-ui-table-cell-x: 12px;
+    --vr-ui-section-gap: 12px;
+    --vr-ui-page-gap: 16px;
+    --vr-ui-soft: color-mix(in srgb, var(--canvas) 72%, var(--surface));
+    --vr-ui-hover: color-mix(in srgb, var(--green-soft) 42%, var(--surface));
+    --vr-ui-info-soft: color-mix(in srgb, var(--blue) 8%, var(--surface));
+    --vr-ui-danger-soft: color-mix(in srgb, var(--red) 8%, var(--surface));
+    --vr-ui-warning-soft: color-mix(in srgb, var(--orange) 10%, var(--surface));
+    --vr-ui-purple-soft: color-mix(in srgb, var(--purple) 8%, var(--surface));
+    --vr-ui-teal-soft: color-mix(in srgb, var(--teal) 8%, var(--surface));
+}
+
+/* -------------------------------------------------------------------------- */
+/* Global authenticated application rhythm                                    */
+/* -------------------------------------------------------------------------- */
+
+.app-view .content {
+    padding: var(--vr-ui-page-gap);
+    background: var(--canvas);
+}
+
+.app-view .page-enter {
+    animation: vr-ui-fade var(--vr-motion-normal) both;
+}
+
+.app-view :where(h1, h2, h3, h4) {
+    font-family: var(--vr-font-sans);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view strong {
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .page-header {
+    align-items: flex-start;
+    gap: var(--vr-space-6);
+    margin-bottom: var(--vr-space-6);
+}
+
+.app-view .page-header > div:first-child {
+    min-width: 0;
+}
+
+.app-view .page-header h1 {
+    margin: 2px 0;
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-tight);
+    letter-spacing: -.02em;
+}
+
+.app-view .page-header p {
+    max-width: 720px;
+    font-size: var(--vr-text-sm);
+    line-height: var(--vr-line-normal);
+}
+
+.app-view .breadcrumb,
+.app-view .eyebrow {
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    letter-spacing: .06em;
+}
+
+.app-view .header-actions {
+    gap: var(--vr-space-3);
+    flex-wrap: wrap;
+}
+
+/* Flat surfaces become the visual hierarchy, never elevation. */
+.app-view :where(
+    .panel,
+    .stat-card,
+    .mini-card,
+    .report-metric,
+    .summary-matrix div,
+    .rma-status,
+    .sms-package,
+    .modal,
+    .toast,
+    .profile-avatar-large,
+    .image-upload img
+) {
+    box-shadow: none !important;
+    transform: none;
+}
+
+.app-view .panel {
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface);
+}
+
+.app-view .panel:hover {
+    border-color: color-mix(in srgb, var(--muted) 38%, var(--line));
+}
+
+.app-view .panel-pad,
+.app-view .form-panel {
+    padding: var(--vr-space-5) var(--vr-space-6);
+}
+
+.app-view .panel-head {
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-5);
+}
+
+.app-view .panel-title {
+    gap: var(--vr-space-4);
+}
+
+.app-view .panel-title > span {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--vr-radius-control);
+    font-size: 8px;
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .panel-title :where(h2, h3) {
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .panel-title p {
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .section-title {
+    margin: 0 0 var(--vr-space-5);
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+    letter-spacing: -.01em;
+}
+
+.app-view .section-title[style*="margin-top"] {
+    margin-top: var(--vr-space-7) !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Final control system                                                       */
+/* -------------------------------------------------------------------------- */
+
+.app-view .button {
+    min-height: var(--vr-ui-action);
+    height: var(--vr-ui-action);
+    padding: 0 var(--vr-space-5);
+    border: 1px solid transparent;
+    border-radius: var(--vr-radius-control);
+    box-shadow: none !important;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+    line-height: 1;
+    transform: none !important;
+    transition:
+        color var(--vr-motion-normal),
+        background-color var(--vr-motion-normal),
+        border-color var(--vr-motion-normal),
+        opacity var(--vr-motion-normal);
+}
+
+.app-view .button:hover,
+.app-view .button:active {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.app-view .button-primary {
+    border-color: var(--green);
+    color: var(--surface);
+    background: var(--green);
+}
+
+.app-view .button-primary:hover {
+    border-color: var(--green-dark);
+    background: var(--green-dark);
+}
+
+.app-view .button-secondary {
+    border-color: var(--line);
+    color: var(--ink);
+    background: var(--surface);
+}
+
+.app-view .button-secondary:hover {
+    border-color: color-mix(in srgb, var(--green) 36%, var(--line));
+    color: var(--green-dark);
+    background: var(--green-soft);
+}
+
+.app-view .button-danger {
+    border-color: color-mix(in srgb, var(--red) 36%, var(--line));
+    color: var(--red);
+    background: var(--vr-ui-danger-soft);
+}
+
+.app-view .button-danger:hover {
+    border-color: var(--red);
+    background: var(--vr-ui-danger-soft);
+}
+
+.app-view .button-blue {
+    border-color: var(--blue);
+    background: var(--blue);
+}
+
+.app-view .button-block {
+    min-height: 32px;
+    height: 32px;
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .button:disabled,
+.app-view .button[aria-disabled="true"] {
+    opacity: .52;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.app-view .two-column {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, .62fr);
+    gap: var(--vr-space-6);
+}
+
+.app-view .form-grid,
+.app-view .form-grid.three,
+.app-view .form-grid.four {
+    gap: var(--vr-space-4);
+}
+
+.app-view .form-field {
+    gap: var(--vr-space-2);
+}
+
+.app-view .form-field label {
+    color: var(--ink);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .form-field :where(input, select, textarea),
+.app-view .table-search {
+    min-height: var(--vr-ui-control);
+    height: var(--vr-ui-control);
+    padding: 2px var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    color: var(--ink);
+    background: var(--surface);
+    box-shadow: none !important;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-regular);
+    outline: none;
+}
+
+.app-view .form-field textarea {
+    min-height: var(--vr-textarea-min);
+    height: auto;
+    padding: var(--vr-space-3) var(--vr-space-4);
+    line-height: var(--vr-line-normal);
+}
+
+.app-view .form-field :where(input, select, textarea):hover,
+.app-view .table-search:hover {
+    border-color: color-mix(in srgb, var(--muted) 56%, var(--line));
+    background: var(--vr-ui-soft);
+}
+
+.app-view .form-field :where(input, select, textarea):focus,
+.app-view .table-search:focus {
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: none !important;
+    outline: none;
+}
+
+.app-view .form-field :where(input, select, textarea):focus-visible,
+.app-view .table-search:focus-visible,
+.app-view .button:focus-visible,
+.app-view .row-button:focus-visible,
+.app-view .status-tabs button:focus-visible,
+.app-view .settings-nav button:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+    box-shadow: none !important;
+}
+
+.app-view .form-field :where(input, select, textarea):disabled,
+.app-view .form-field :where(input, textarea)[readonly] {
+    color: var(--muted);
+    background: var(--canvas);
+    opacity: .66;
+}
+
+.app-view .form-field small {
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-regular);
+}
+
+.app-view .form-actions {
+    gap: var(--vr-space-3);
+    margin-top: var(--vr-space-5);
+    padding-top: var(--vr-space-5);
+}
+
+.app-view .record-summary {
+    gap: 0;
+}
+
+.app-view .summary-item {
+    min-height: 34px;
+    padding: var(--vr-space-3) 0;
+}
+
+.app-view .summary-item span {
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .summary-item strong {
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-semibold);
+}
+
+/* Native choice controls must never inherit full text-input dimensions. */
+.app-view input[type="checkbox"],
+.app-view input[type="radio"] {
+    width: 14px !important;
+    min-width: 14px !important;
+    height: 14px !important;
+    min-height: 14px !important;
+    padding: 0 !important;
+    border-radius: 4px;
+    accent-color: var(--green);
+    box-shadow: none !important;
+}
+
+.app-view input[type="radio"] {
+    border-radius: 50%;
+}
+
+.app-view .day-picker,
+.app-view .permission-grid,
+.app-view .toggle-row {
+    gap: var(--vr-space-3);
+}
+
+.app-view .day-picker label,
+.app-view .permission-grid label,
+.app-view .toggle-row label {
+    min-height: var(--vr-ui-control);
+    gap: var(--vr-space-3);
+    padding: var(--vr-space-2) var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    color: var(--ink);
+    background: var(--surface);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-regular);
+    line-height: 1;
+}
+
+.app-view .day-picker label:hover,
+.app-view .permission-grid label:hover,
+.app-view .toggle-row label:hover {
+    border-color: color-mix(in srgb, var(--green) 36%, var(--line));
+    background: var(--green-soft);
+}
+
+.app-view .permission-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--vr-space-3);
+    max-height: 240px;
+    padding-right: var(--vr-space-2);
+}
+
+/* Browser file controls + upload surfaces. */
+.app-view .form-field input[type="file"] {
+    min-height: 34px;
+    height: auto;
+    padding: 2px;
+    color: var(--muted);
+    background: var(--surface);
+}
+
+.app-view input[type="file"]::file-selector-button {
+    min-height: var(--vr-ui-action);
+    margin-right: var(--vr-space-4);
+    padding: 0 var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--ink);
+    background: var(--canvas);
+    font: inherit;
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    cursor: pointer;
+}
+
+.app-view input[type="file"]::file-selector-button:hover {
+    color: var(--green-dark);
+    background: var(--green-soft);
+}
+
+.app-view .upload-placeholder,
+.app-view .image-upload {
+    min-height: 72px;
+    padding: var(--vr-space-5);
+    border: 1px dashed color-mix(in srgb, var(--green) 42%, var(--line));
+    border-radius: var(--vr-radius-control);
+    color: var(--green-dark);
+    background: var(--vr-ui-hover);
+    box-shadow: none;
+}
+
+.app-view .image-upload {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--vr-space-2) var(--vr-space-5);
+}
+
+.app-view .image-upload img {
+    width: 54px;
+    height: 54px;
+    border-radius: var(--vr-radius-control);
+}
+
+.app-view .image-upload span {
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .image-upload small {
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .image-upload input[type="file"] {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Compact table/data system — VibTools 12px / 6px×12px contract              */
+/* -------------------------------------------------------------------------- */
+
+.app-view .table-panel {
+    overflow: hidden;
+}
+
+.app-view .table-toolbar {
+    min-height: 46px;
+    gap: var(--vr-space-4);
+    padding: var(--vr-space-4) var(--vr-space-5);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.app-view .table-toolbar h2 {
+    margin: 0;
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .table-toolbar p {
+    margin: 1px 0 0;
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .toolbar-tools {
+    gap: var(--vr-space-3);
+}
+
+.app-view .table-search {
+    width: 220px;
+    min-height: var(--vr-ui-toolbar);
+    height: var(--vr-ui-toolbar);
+    padding: 2px var(--vr-space-4);
+}
+
+.app-view .table-wrap {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--muted) 36%, transparent) transparent;
+}
+
+.app-view .data-table {
+    font-size: var(--vr-text-sm);
+    line-height: var(--vr-line-compact);
+}
+
+.app-view .data-table th {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    padding: var(--vr-ui-table-cell-y) var(--vr-ui-table-cell-x);
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    background: var(--canvas);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    letter-spacing: .035em;
+    text-transform: uppercase;
+}
+
+.app-view .data-table td {
+    padding: var(--vr-ui-table-cell-y) var(--vr-ui-table-cell-x);
+    border-top: 1px solid var(--line);
+    color: color-mix(in srgb, var(--ink) 82%, var(--muted));
+    font-size: var(--vr-text-sm);
+    vertical-align: middle;
+}
+
+.app-view .data-table tbody tr {
+    background: var(--surface);
+    transition: background-color var(--vr-motion-fast);
+}
+
+.app-view .data-table tbody tr:hover {
+    background: var(--vr-ui-hover);
+}
+
+.app-view .data-table td strong {
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .data-table td small {
+    color: var(--muted);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-regular);
+}
+
+.app-view .empty-row td {
+    padding: var(--vr-space-8) var(--vr-space-6);
+    background: var(--vr-ui-soft);
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .row-actions {
+    gap: var(--vr-space-2);
+}
+
+.app-view .row-button {
+    min-height: var(--vr-ui-row-action);
+    height: var(--vr-ui-row-action);
+    padding: 0 var(--vr-space-4);
+    border: 1px solid color-mix(in srgb, var(--green) 22%, var(--line));
+    border-radius: 6px;
+    color: var(--green-dark);
+    background: var(--green-soft);
+    box-shadow: none;
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    line-height: 1;
+    transform: none;
+}
+
+.app-view .row-button:hover {
+    border-color: var(--green);
+    background: var(--green-soft);
+    transform: none;
+}
+
+.app-view .row-button.danger {
+    border-color: color-mix(in srgb, var(--red) 28%, var(--line));
+    color: var(--red);
+    background: var(--vr-ui-danger-soft);
+}
+
+.app-view .data-table :where(input, select) {
+    min-height: 28px;
+    height: 28px;
+    padding: 1px var(--vr-space-3);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    box-shadow: none;
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .item-table input {
+    width: 72px;
+    min-height: 28px;
+    height: 28px;
+    padding: 1px var(--vr-space-3);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Badges, tabs, status, feedback and progress                                */
+/* -------------------------------------------------------------------------- */
+
+.app-view .badge {
+    min-height: 20px;
+    padding: 1px var(--vr-space-3);
+    border: 1px solid color-mix(in srgb, var(--green) 18%, var(--line));
+    border-radius: var(--vr-radius-pill);
+    color: var(--green-dark);
+    background: var(--green-soft);
+    font-size: 10.5px;
+    font-weight: var(--vr-weight-medium);
+    line-height: 1;
+}
+
+.app-view .badge.blue {
+    border-color: color-mix(in srgb, var(--blue) 20%, var(--line));
+    color: var(--blue);
+    background: var(--vr-ui-info-soft);
+}
+
+.app-view .badge.red {
+    border-color: color-mix(in srgb, var(--red) 22%, var(--line));
+    color: var(--red);
+    background: var(--vr-ui-danger-soft);
+}
+
+.app-view .badge.gold {
+    border-color: color-mix(in srgb, var(--orange) 24%, var(--line));
+    color: var(--orange);
+    background: var(--vr-ui-warning-soft);
+}
+
+.app-view .badge.gray {
+    border-color: var(--line);
+    color: var(--muted);
+    background: var(--canvas);
+}
+
+.app-view .status-tabs,
+.app-view .report-tabs {
+    gap: var(--vr-space-2);
+    margin-bottom: var(--vr-space-5);
+    padding: var(--vr-space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    background: var(--surface);
+}
+
+.app-view .status-tabs[style*="margin-top"] {
+    margin-top: var(--vr-space-6) !important;
+}
+
+.app-view .status-tabs button,
+.app-view .report-tabs button {
+    min-height: var(--vr-ui-action);
+    height: var(--vr-ui-action);
+    padding: 0 var(--vr-space-4);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--muted);
+    background: transparent;
+    box-shadow: none !important;
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    transform: none;
+}
+
+.app-view .status-tabs button:hover,
+.app-view .report-tabs button:hover {
+    color: var(--green-dark);
+    background: var(--green-soft);
+}
+
+.app-view .status-tabs button.active,
+.app-view .report-tabs button.active {
+    border-color: var(--green);
+    color: var(--surface);
+    background: var(--green);
+    box-shadow: none !important;
+}
+
+.app-view .progress {
+    height: 4px;
+    margin-top: var(--vr-space-4);
+    border-radius: var(--vr-radius-pill);
+    background: color-mix(in srgb, var(--muted) 14%, transparent);
+}
+
+.app-view .progress i {
+    border-radius: var(--vr-radius-pill);
+}
+
+.app-view .security-panel {
+    margin-top: var(--vr-space-6);
+}
+
+.app-view .security-notice,
+.app-view .confirm-copy {
+    margin: 0 0 var(--vr-space-5);
+    padding: var(--vr-space-4) var(--vr-space-5);
+    border: 1px solid color-mix(in srgb, var(--orange) 30%, var(--line));
+    border-left: 3px solid var(--orange);
+    border-radius: var(--vr-radius-control);
+    color: var(--ink);
+    background: var(--vr-ui-warning-soft);
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .security-notice p {
+    margin: 3px 0 0;
+    font-size: var(--vr-text-xs);
+}
+
+/* Loading, empty and error presentation. */
+.app-view .loading-state {
+    min-height: 180px;
+    gap: var(--vr-space-4);
+    color: var(--muted);
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .loader {
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
+    border-color: var(--line);
+    border-top-color: var(--green);
+}
+
+.app-view .empty-state {
+    min-height: 160px;
+    padding: var(--vr-space-7);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface);
+}
+
+.app-view .empty-state > span {
+    width: 36px;
+    height: 36px;
+    margin-bottom: var(--vr-space-4);
+    border-radius: var(--vr-radius-control);
+    font-size: var(--vr-text-md);
+}
+
+.app-view .empty-state h3 {
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .empty-state p {
+    margin: var(--vr-space-2) 0 var(--vr-space-5);
+    font-size: var(--vr-text-sm);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dashboard final compact redesign                                           */
+/* -------------------------------------------------------------------------- */
+
+.app-view .quick-actions {
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-6);
+}
+
+.app-view .quick-action {
+    min-height: 34px;
+    padding: 0 var(--vr-space-5);
+    gap: var(--vr-space-3);
+    border: 1px solid transparent;
+    border-radius: var(--vr-radius-control);
+    box-shadow: none !important;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+    line-height: 1;
+    transform: none !important;
+}
+
+.app-view .quick-action:hover {
+    filter: saturate(.96);
+    transform: none !important;
+}
+
+.app-view .quick-action span {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    font-size: 8px;
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .filter-bar {
+    min-height: 42px;
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-6);
+    padding: var(--vr-space-3) var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface);
+    box-shadow: none !important;
+}
+
+.app-view .filter-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--vr-radius-control);
+    font-size: 9px;
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .filter-bar :where(select, input) {
+    height: var(--vr-ui-control);
+    min-height: var(--vr-ui-control);
+    padding: 1px var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    background: var(--surface);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .filter-bar .muted {
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--vr-space-5);
+    margin-bottom: var(--vr-space-6);
+}
+
+.app-view .stat-card {
+    min-height: 158px;
+    padding: var(--vr-space-6);
+    border: 1px solid color-mix(in srgb, var(--green) 16%, var(--line));
+    border-radius: var(--vr-radius-card);
+}
+
+.app-view .stat-card::after {
+    display: none;
+}
+
+.app-view .stat-card.blue {
+    border-color: color-mix(in srgb, var(--blue) 16%, var(--line));
+}
+
+.app-view .stat-card.gold {
+    border-color: color-mix(in srgb, var(--orange) 18%, var(--line));
+}
+
+.app-view .stat-card.violet {
+    border-color: color-mix(in srgb, var(--purple) 16%, var(--line));
+}
+
+.app-view .stat-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--vr-radius-control);
+    box-shadow: none !important;
+    font-size: 8px;
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .stat-count {
+    font-size: var(--vr-text-lg);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .stat-label {
+    margin: var(--vr-space-5) 0 1px;
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    letter-spacing: .03em;
+}
+
+.app-view .stat-value {
+    margin: 0 0 var(--vr-space-4);
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-semibold);
+    letter-spacing: -.02em;
+}
+
+.app-view .stat-row {
+    margin: 3px 0;
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .mini-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-6);
+}
+
+.app-view .mini-card {
+    min-height: 58px;
+    gap: var(--vr-space-4);
+    padding: var(--vr-space-4) var(--vr-space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+}
+
+.app-view .mini-card > span {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 8px;
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .mini-card p {
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .mini-card strong {
+    margin-top: 1px;
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .dashboard-lower {
+    gap: var(--vr-space-6);
+    margin-bottom: var(--vr-space-6);
+}
+
+.app-view .financial-bars {
+    gap: var(--vr-space-5);
+    padding-top: var(--vr-space-3);
+}
+
+.app-view .financial-bar label {
+    margin-bottom: var(--vr-space-2);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .bar-track {
+    height: 6px;
+    border-radius: var(--vr-radius-pill);
+}
+
+.app-view .trend-summary {
+    gap: var(--vr-space-3);
+    margin-bottom: var(--vr-space-5);
+}
+
+.app-view .trend-summary div {
+    padding: var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+}
+
+.app-view .trend-summary small {
+    font-size: 10px;
+}
+
+.app-view .trend-summary strong {
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .trend-chart {
+    height: 150px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Transaction / purchasing / sales / quotation density                       */
+/* -------------------------------------------------------------------------- */
+
+.app-view .transaction-layout {
+    grid-template-columns: minmax(0, 1fr) 292px;
+    gap: var(--vr-space-6);
+}
+
+.app-view .transaction-main {
+    gap: var(--vr-space-5);
+}
+
+.app-view .product-picker {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: var(--vr-space-4);
+    padding: var(--vr-space-5) var(--vr-space-6);
+    align-items: end;
+}
+
+.app-view .product-picker > .form-field[style] {
+    grid-column: 1 / 2 !important;
+}
+
+.app-view .product-picker .button {
+    min-width: max-content;
+}
+
+.app-view #product-search-results {
+    max-height: 280px !important;
+    margin-top: 3px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: var(--vr-radius-control) !important;
+    background: var(--surface) !important;
+    box-shadow: none !important;
+}
+
+.app-view .product-live-result {
+    gap: var(--vr-space-2) var(--vr-space-5) !important;
+    padding: var(--vr-space-4) var(--vr-space-5) !important;
+    border-bottom: 1px solid var(--line) !important;
+    background: var(--surface) !important;
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .product-live-result:hover,
+.app-view .product-live-result:focus-visible {
+    background: var(--green-soft) !important;
+}
+
+.app-view .product-live-result strong {
+    font-size: var(--vr-text-sm) !important;
+    font-weight: var(--vr-weight-medium) !important;
+}
+
+.app-view .product-live-result small {
+    margin-top: 1px !important;
+    font-size: var(--vr-text-xs) !important;
+}
+
+.app-view .transaction-side {
+    top: 56px;
+    padding: var(--vr-space-5) var(--vr-space-6);
+}
+
+.app-view .transaction-side h3 {
+    margin: 0 0 var(--vr-space-5);
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .total-line {
+    gap: var(--vr-space-5);
+    margin: var(--vr-space-3) 0;
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .total-line strong {
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .total-line.grand {
+    margin: var(--vr-space-5) calc(var(--vr-space-6) * -1);
+    padding: var(--vr-space-5) var(--vr-space-6);
+}
+
+.app-view .total-line.grand span,
+.app-view .total-line.grand strong {
+    font-size: var(--vr-text-lg);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .side-fields {
+    gap: var(--vr-space-4);
+    margin-top: var(--vr-space-5);
+}
+
+.app-view .side-fields .form-field :where(input, select) {
+    min-height: var(--vr-ui-control);
+    height: var(--vr-ui-control);
+}
+
+.app-view .payment-card {
+    margin-top: var(--vr-space-5);
+    padding: var(--vr-space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    background: var(--green-soft);
+}
+
+.app-view .payment-card h4 {
+    margin: 0 0 var(--vr-space-4);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view section.table-panel[style*="margin-top"] {
+    margin-top: var(--vr-space-6) !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Modal / toast / overlay system                                             */
+/* -------------------------------------------------------------------------- */
+
+.app-view .modal-backdrop {
+    padding: var(--vr-space-7);
+    background: color-mix(in srgb, var(--ink) 52%, transparent);
+    backdrop-filter: blur(2px);
+    animation: vr-ui-fade var(--vr-motion-fast);
+}
+
+.app-view .modal {
+    width: min(620px, 100%);
+    max-height: calc(100vh - 32px);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface);
+    box-shadow: none !important;
+    animation: vr-ui-fade var(--vr-motion-normal);
+}
+
+.app-view .modal.large {
+    width: min(900px, 100%);
+}
+
+.app-view .modal-head {
+    min-height: 42px;
+    padding: var(--vr-space-4) var(--vr-space-6);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.app-view .modal-head h2 {
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .modal-head button {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 18px;
+}
+
+.app-view .modal-head button:hover {
+    border-color: var(--line);
+    color: var(--ink);
+    background: var(--canvas);
+}
+
+.app-view .modal-body {
+    padding: var(--vr-space-6);
+}
+
+.app-view .modal-actions {
+    gap: var(--vr-space-3);
+    padding: var(--vr-space-4) var(--vr-space-6);
+    border-top: 1px solid var(--line);
+}
+
+.app-view .toast-root {
+    right: var(--vr-space-6);
+    bottom: var(--vr-space-6);
+    gap: var(--vr-space-3);
+}
+
+.app-view .toast {
+    min-width: 220px;
+    max-width: min(360px, calc(100vw - 24px));
+    padding: var(--vr-space-4) var(--vr-space-5);
+    border: 1px solid color-mix(in srgb, var(--green) 34%, var(--ink));
+    border-left: 3px solid var(--green);
+    border-radius: var(--vr-radius-control);
+    color: var(--surface);
+    background: var(--ink);
+    box-shadow: none !important;
+    font-size: var(--vr-text-sm);
+    line-height: var(--vr-line-normal);
+    animation: vr-ui-fade var(--vr-motion-normal);
+}
+
+.app-view .toast.error {
+    border-color: color-mix(in srgb, var(--red) 48%, var(--ink));
+    border-left-color: var(--red);
+    background: var(--ink);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Reports, settings, HRM, marketplace, barcode and specialist surfaces       */
+/* -------------------------------------------------------------------------- */
+
+.app-view .lookup-layout {
+    grid-template-columns: minmax(240px, .4fr) minmax(0, 1fr);
+    gap: var(--vr-space-6);
+}
+
+.app-view .lookup-list {
+    gap: var(--vr-space-3);
+    padding: var(--vr-space-5);
+}
+
+.app-view .lookup-item {
+    min-height: 34px;
+    padding: var(--vr-space-3) var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .barcode-toolbar {
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-5);
+}
+
+.app-view .barcode-grid {
+    gap: var(--vr-space-4);
+}
+
+.app-view .barcode-label {
+    padding: var(--vr-space-5);
+    border-radius: var(--vr-radius-control);
+}
+
+.app-view .barcode-label h4 {
+    margin: 0 0 var(--vr-space-3);
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .barcode-lines {
+    height: 40px;
+}
+
+.app-view .report-metrics {
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-6);
+}
+
+.app-view .report-metric {
+    padding: var(--vr-space-5) var(--vr-space-6);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface);
+}
+
+.app-view .report-metric small {
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .report-metric strong {
+    margin-top: var(--vr-space-2);
+    font-size: var(--vr-text-lg);
+    font-weight: var(--vr-weight-semibold);
+    letter-spacing: -.01em;
+}
+
+.app-view .settings-grid {
+    grid-template-columns: 176px minmax(0, 1fr);
+    gap: var(--vr-space-6);
+}
+
+.app-view .settings-nav {
+    padding: var(--vr-space-3);
+}
+
+.app-view .settings-nav button {
+    min-height: var(--vr-ui-action);
+    padding: 0 var(--vr-space-4);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-regular);
+}
+
+.app-view .settings-nav button:hover {
+    color: var(--ink);
+    background: var(--canvas);
+}
+
+.app-view .settings-nav button.active {
+    border-color: color-mix(in srgb, var(--green) 24%, var(--line));
+    color: var(--green-dark);
+    background: var(--green-soft);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .activity-item {
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: var(--vr-space-4);
+    min-height: 42px;
+    padding: var(--vr-space-3) 0;
+}
+
+.app-view .activity-item > span {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 8px;
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .activity-item p {
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .activity-item small {
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .rma-board {
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-6);
+}
+
+.app-view .rma-status {
+    min-height: 62px;
+    padding: var(--vr-space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface) !important;
+}
+
+.app-view .rma-status span {
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .rma-status strong {
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .profile-editor {
+    gap: var(--vr-space-5);
+    padding-bottom: var(--vr-space-5);
+}
+
+.app-view .profile-avatar-large {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--vr-radius-card);
+    color: var(--surface);
+    background: var(--green);
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .marketplace-hero {
+    gap: var(--vr-space-6);
+    padding: var(--vr-space-7);
+    border: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.app-view .marketplace-hero h2 {
+    margin: var(--vr-space-2) 0;
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-medium);
+    letter-spacing: -.02em;
+}
+
+.app-view .marketplace-hero p {
+    margin: var(--vr-space-2) 0 var(--vr-space-5);
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .marketplace-mark {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    border-radius: var(--vr-radius-card);
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.app-view .marketplace-grid {
+    gap: var(--vr-space-5);
+    margin-top: var(--vr-space-6);
+}
+
+.app-view .marketplace-grid h3 {
+    margin: 0 0 var(--vr-space-3);
+    font-size: var(--vr-text-md);
+}
+
+.app-view .business-overview,
+.app-view .summary-matrix {
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-6);
+}
+
+.app-view .business-overview .panel {
+    padding: var(--vr-space-5);
+}
+
+.app-view .business-overview h3 {
+    margin: 0 0 var(--vr-space-4);
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .summary-matrix div {
+    min-height: 58px;
+    padding: var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    background: var(--surface);
+}
+
+.app-view .summary-matrix small {
+    min-height: auto;
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .summary-matrix strong {
+    margin-top: var(--vr-space-2);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .sms-balance {
+    min-height: var(--vr-ui-action);
+    padding: 0 var(--vr-space-4);
+    border: 1px solid color-mix(in srgb, var(--green) 28%, var(--line));
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.app-view .sms-balance strong {
+    font-size: var(--vr-text-sm);
+}
+
+.app-view .sms-package-grid {
+    gap: var(--vr-space-5);
+}
+
+.app-view .sms-package {
+    min-height: 142px;
+    padding: var(--vr-space-6);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--surface) !important;
+}
+
+.app-view .sms-package::after {
+    display: none;
+}
+
+.app-view .sms-package > span {
+    font-size: 10px;
+    font-weight: var(--vr-weight-medium);
+    letter-spacing: .06em;
+}
+
+.app-view .sms-package h2 {
+    margin: var(--vr-space-6) 0 var(--vr-space-2);
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .sms-package h2 small {
+    font-size: var(--vr-text-xs);
+}
+
+.app-view .sms-package p {
+    margin: 0 0 var(--vr-space-5);
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.app-view .sms-package.featured {
+    color: var(--ink);
+    border-color: color-mix(in srgb, var(--green) 34%, var(--line));
+    background: var(--green-soft) !important;
+    transform: none !important;
+}
+
+.app-view .sms-package.featured > span,
+.app-view .sms-package.featured h2 small,
+.app-view .sms-package.featured p {
+    color: inherit;
+}
+
+/* Utility values stay semantic but less visually loud. */
+.app-view .positive,
+.app-view .stat-row strong.in {
+    color: var(--green-dark);
+}
+
+.app-view .negative,
+.app-view .stat-row strong.out {
+    color: var(--red);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Login/auth — VibTools centered split auth structure using VibRetail theme   */
+/* -------------------------------------------------------------------------- */
+
+.login-view {
+    min-height: 100vh;
+    background: var(--canvas) !important;
+}
+
+.login-view .login-stage {
+    grid-template-columns: minmax(230px, .84fr) minmax(320px, 1.16fr);
+    align-items: stretch;
+    gap: 0;
+    width: min(820px, calc(100% - 32px));
+    min-height: auto;
+    margin: 0 auto;
+    padding: clamp(32px, 8vh, 72px) 0;
+}
+
+.login-view .login-art {
+    min-height: 440px;
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-right: 0;
+    border-radius: var(--vr-radius-card) 0 0 var(--vr-radius-card);
+    color: var(--ink);
+    background: var(--green-soft);
+}
+
+.login-view .login-preview,
+.login-view .orbit {
+    display: none;
+}
+
+.login-view .login-art > p {
+    position: static;
+    margin: 0;
+    color: var(--green-dark);
+    font-size: var(--vr-text-lg);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-normal);
+    letter-spacing: -.01em;
+}
+
+.login-view .login-card {
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 0 var(--vr-radius-card) var(--vr-radius-card) 0;
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.login-view .login-brand {
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-8);
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+}
+
+.login-view .brand-mark {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+    border-radius: var(--vr-radius-control);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.login-view .eyebrow {
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    letter-spacing: .08em;
+}
+
+.login-view .login-copy h1 {
+    margin: var(--vr-space-3) 0 var(--vr-space-2);
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-tight);
+    letter-spacing: -.02em;
+}
+
+.login-view .login-copy p {
+    margin: 0 0 var(--vr-space-7);
+    font-size: var(--vr-text-sm);
+}
+
+.login-view .stack-form {
+    gap: var(--vr-space-5);
+}
+
+.login-view .stack-form label {
+    gap: var(--vr-space-2);
+    color: var(--ink);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.login-view .stack-form input {
+    height: var(--vr-ui-control);
+    padding: 0 var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    color: var(--ink);
+    background: var(--surface);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+}
+
+.login-view .stack-form input:hover {
+    background: var(--vr-ui-soft);
+}
+
+.login-view .stack-form input:focus {
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: none;
+    outline: none;
+}
+
+.login-view .password-wrap input {
+    padding-right: 54px;
+}
+
+.login-view .password-wrap button {
+    right: 4px;
+    top: 3px;
+    height: 24px;
+    padding: 0 var(--vr-space-3);
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--green-dark);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.login-view .password-wrap button:hover {
+    border-color: var(--line);
+    background: var(--green-soft);
+}
+
+.login-view .button {
+    min-height: var(--vr-ui-action);
+    height: var(--vr-ui-action);
+    padding: 0 var(--vr-space-5);
+    border-radius: var(--vr-radius-control);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+    transform: none;
+}
+
+.login-view .button-primary {
+    border: 1px solid var(--green);
+    background: var(--green);
+}
+
+.login-view .button-primary:hover {
+    background: var(--green-dark);
+}
+
+.login-view .button-block {
+    min-height: 30px;
+    height: 30px;
+}
+
+.login-view .form-message {
+    min-height: 16px;
+    margin: 0;
+    font-size: var(--vr-text-xs);
+}
+
+.login-view .login-developer {
+    gap: var(--vr-space-2);
+    margin-top: var(--vr-space-7);
+    padding-top: var(--vr-space-5);
+    font-size: 10px;
+}
+
+.login-view .login-developer strong,
+.login-view .login-developer a {
+    font-weight: var(--vr-weight-medium);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Installer — compact setup surface, business/security behavior untouched     */
+/* -------------------------------------------------------------------------- */
+
+.installer-view {
+    color: var(--ink);
+    background: var(--canvas);
+    font-family: var(--vr-font-sans);
+    font-size: var(--vr-text-base);
+}
+
+.installer-view .wrap {
+    max-width: 880px;
+    padding: 24px 16px 48px;
+}
+
+.installer-view .brand {
+    gap: var(--vr-space-4);
+    margin-bottom: var(--vr-space-6);
+}
+
+.installer-view .mark {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--vr-radius-control);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.installer-view .card {
+    margin-bottom: var(--vr-space-5);
+    padding: var(--vr-space-6);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.installer-view .hero h1,
+.installer-view .lock h1 {
+    margin: 2px 0;
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-medium);
+}
+
+.installer-view h2 {
+    margin: 0 0 var(--vr-space-5);
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+}
+
+.installer-view .muted {
+    font-size: var(--vr-text-sm);
+}
+
+.installer-view .steps {
+    gap: var(--vr-space-2);
+    margin: var(--vr-space-5) 0;
+}
+
+.installer-view .step-pill,
+.installer-view .tag {
+    min-height: 24px;
+    padding: 3px var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-pill);
+    background: var(--surface);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-regular);
+}
+
+.installer-view .step-pill.active,
+.installer-view .tag {
+    border-color: color-mix(in srgb, var(--green) 24%, var(--line));
+    color: var(--green-dark);
+    background: var(--green-soft);
+    font-weight: var(--vr-weight-medium);
+}
+
+.installer-view .grid,
+.installer-view .checks,
+.installer-view .summary {
+    gap: var(--vr-space-4);
+}
+
+.installer-view .field {
+    gap: var(--vr-space-2);
+}
+
+.installer-view label {
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+}
+
+.installer-view :where(input, select) {
+    min-height: var(--vr-ui-control);
+    padding: 2px var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    color: var(--ink);
+    background: var(--surface);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+}
+
+.installer-view :where(input, select):focus {
+    border-color: var(--green);
+    outline: none;
+    box-shadow: none;
+}
+
+.installer-view .check,
+.installer-view .summary div,
+.installer-view .checkbox,
+.installer-view .notice,
+.installer-view .success {
+    padding: var(--vr-space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    background: var(--vr-ui-soft);
+}
+
+.installer-view .check.bad,
+.installer-view .notice.error {
+    border-color: color-mix(in srgb, var(--red) 28%, var(--line));
+    color: var(--red);
+    background: var(--vr-ui-danger-soft);
+}
+
+.installer-view .actions {
+    gap: var(--vr-space-3);
+    margin-top: var(--vr-space-6);
+}
+
+.installer-view .button {
+    min-height: var(--vr-ui-action);
+    height: var(--vr-ui-action);
+    padding: 0 var(--vr-space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-control);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+}
+
+.installer-view .button.primary {
+    border-color: var(--green);
+    color: var(--surface);
+    background: var(--green);
+}
+
+.installer-view .button.secondary {
+    color: var(--ink);
+    background: var(--surface);
+}
+
+.installer-view .password-meter {
+    height: 4px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* License presentation — text/terms untouched                                */
+/* -------------------------------------------------------------------------- */
+
+.license-view {
+    background: var(--canvas) !important;
+}
+
+.license-view .license-shell {
+    width: min(920px, calc(100% - 32px));
+    padding: 32px 0;
+}
+
+.license-view .license-hero {
+    gap: var(--vr-space-6);
+    margin-bottom: var(--vr-space-6);
+}
+
+.license-view .license-logo {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    border-radius: var(--vr-radius-card);
+    background: var(--green);
+    box-shadow: none;
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-semibold);
+}
+
+.license-view .license-hero h1 {
+    margin: 2px 0 var(--vr-space-2);
+    font-size: var(--vr-text-xl);
+    font-weight: var(--vr-weight-medium);
+    letter-spacing: -.02em;
+}
+
+.license-view .license-hero p {
+    font-size: var(--vr-text-sm);
+}
+
+.license-view .license-grid {
+    grid-template-columns: minmax(240px, .72fr) minmax(0, 1.28fr);
+    gap: var(--vr-space-6);
+}
+
+.license-view .license-card {
+    padding: var(--vr-space-7);
+    border: 1px solid var(--line);
+    border-radius: var(--vr-radius-card);
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.license-view .license-card h2 {
+    margin: var(--vr-space-4) 0 var(--vr-space-3);
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+}
+
+.license-view .identity-card {
+    color: var(--surface);
+    background: var(--green-dark);
+}
+
+.license-view .license-links {
+    gap: var(--vr-space-3);
+    margin-top: var(--vr-space-6);
+}
+
+.license-view .license-links a {
+    min-height: 30px;
+    padding: var(--vr-space-3) var(--vr-space-4);
+    border-radius: var(--vr-radius-control);
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+}
+
+.license-view .terms-card ul {
+    gap: var(--vr-space-3);
+    margin: var(--vr-space-4) 0 var(--vr-space-6);
+    font-size: var(--vr-text-sm);
+}
+
+.license-view .license-note {
+    margin: var(--vr-space-6) 0;
+    padding: var(--vr-space-4) var(--vr-space-5);
+    border-left-width: 3px;
+    border-radius: var(--vr-radius-control);
+    font-size: var(--vr-text-sm);
+}
+
+.license-view .license-footer {
+    margin-top: var(--vr-space-6);
+    font-size: var(--vr-text-xs);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Final responsive contract                                                  */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 1280px) {
+    .app-view .stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .app-view .mini-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .app-view .business-overview,
+    .app-view .summary-matrix {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .app-view .transaction-layout {
+        grid-template-columns: minmax(0, 1fr) 272px;
+    }
+}
+
+@media (max-width: 980px) {
+    .app-view .content {
+        padding: var(--vr-space-6);
+    }
+
+    .app-view :where(
+        .dashboard-lower,
+        .transaction-layout,
+        .two-column,
+        .settings-grid,
+        .lookup-layout
+    ) {
+        grid-template-columns: 1fr;
+    }
+
+    .app-view .transaction-side {
+        position: static;
+    }
+
+    .app-view .settings-nav {
+        display: flex;
+        overflow-x: auto;
+        gap: var(--vr-space-2);
+    }
+
+    .app-view .settings-nav button {
+        width: auto;
+        min-width: max-content;
+    }
+
+    .app-view .rma-board,
+    .app-view .marketplace-grid,
+    .app-view .sms-package-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .app-view .content {
+        padding: var(--vr-space-5);
+    }
+
+    .app-view .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        margin-bottom: var(--vr-space-5);
+    }
+
+    .app-view .page-header h1 {
+        font-size: 18px;
+    }
+
+    .app-view .header-actions {
+        justify-content: flex-start;
+    }
+
+    .app-view .quick-actions {
+        display: flex;
+        overflow-x: auto;
+        gap: var(--vr-space-3);
+        padding-bottom: var(--vr-space-2);
+    }
+
+    .app-view .quick-action {
+        min-width: 118px;
+        flex: 0 0 auto;
+    }
+
+    .app-view :where(
+        .stat-grid,
+        .mini-grid,
+        .form-grid,
+        .form-grid.three,
+        .form-grid.four,
+        .report-metrics,
+        .business-overview,
+        .summary-matrix,
+        .rma-board,
+        .marketplace-grid,
+        .sms-package-grid
+    ) {
+        grid-template-columns: 1fr;
+    }
+
+    .app-view .panel-pad,
+    .app-view .form-panel {
+        padding: var(--vr-space-5);
+    }
+
+    .app-view .product-picker {
+        grid-template-columns: 1fr;
+    }
+
+    .app-view .product-picker > .form-field[style] {
+        grid-column: auto !important;
+    }
+
+    .app-view .product-picker .button {
+        width: 100%;
+    }
+
+    .app-view .table-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .app-view .toolbar-tools,
+    .app-view .table-search {
+        width: 100%;
+    }
+
+    .app-view .permission-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .app-view .modal-backdrop {
+        align-items: stretch;
+        padding: var(--vr-space-5);
+    }
+
+    .app-view .modal {
+        max-height: calc(100vh - 20px);
+    }
+
+    .app-view .modal-head,
+    .app-view .modal-body,
+    .app-view .modal-actions {
+        padding-inline: var(--vr-space-5);
+    }
+
+    .app-view .toast-root {
+        right: var(--vr-space-4);
+        bottom: var(--vr-space-4);
+        left: var(--vr-space-4);
+    }
+
+    .app-view .toast {
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+    }
+
+    .login-view .login-stage {
+        grid-template-columns: 1fr;
+        width: min(440px, calc(100% - 24px));
+        padding: 24px 0;
+    }
+
+    .login-view .login-art {
+        min-height: auto;
+        padding: var(--vr-space-6);
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+        border-radius: var(--vr-radius-card) var(--vr-radius-card) 0 0;
+    }
+
+    .login-view .login-art > p {
+        font-size: var(--vr-text-sm);
+    }
+
+    .login-view .login-card {
+        padding: var(--vr-space-7);
+        border-radius: 0 0 var(--vr-radius-card) var(--vr-radius-card);
+    }
+
+    .installer-view .grid,
+    .installer-view .checks,
+    .installer-view .summary {
+        grid-template-columns: 1fr;
+    }
+
+    .license-view .license-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-view .page-enter,
+    .app-view .modal,
+    .app-view .modal-backdrop,
+    .app-view .toast,
+    .app-view .quick-action,
+    .app-view .button,
+    .app-view .row-button {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media print {
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 4px 6px !important;
+        border: 1px solid var(--line) !important;
+        box-shadow: none !important;
+    }
+
+    .panel,
+    .table-panel {
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .table-toolbar,
+    .row-button,
+    .button {
+        box-shadow: none !important;
+    }
+}
+
+@keyframes vr-ui-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+/* ========================================================================== */
+/* Final UI R2 — clean hierarchy, pagination, navigation & dashboard          */
+/* ========================================================================== */
+
+/* Remove decorative descriptions; data/help/error copy remains contextual. */
+.app-view .page-header p,
+.app-view .panel-title p,
+.app-view .table-toolbar > div > p,
+.app-view .compact-panel-head p { display: none !important; }
+
+.app-view .page-header { margin-bottom: 10px; }
+.app-view .section-title { margin-bottom: 8px; }
+
+/* VibTools navigation structure mapped to VibRetail palette. */
+.app-view .nav-link,
+.app-view .nav-parent {
+    border: 1px solid transparent;
+    border-left: 2px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+}
+.app-view .nav-link:hover,
+.app-view .nav-parent:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--green-soft) 54%, var(--surface));
+    border-color: var(--line);
+    border-left-color: transparent;
+}
+.app-view .nav-link.active {
+    color: var(--green-dark);
+    background: color-mix(in srgb, var(--green-soft) 70%, var(--surface));
+    border-color: var(--line);
+    border-left-color: var(--green);
+}
+.app-view .nav-link.active:hover { border-left-color: var(--green); }
+.app-view .nav-link.active .nav-icon {
+    color: var(--green-dark);
+    background: transparent;
+}
+.app-view .nav-children a.active {
+    color: var(--green-dark);
+    background: color-mix(in srgb, var(--green-soft) 64%, var(--surface));
+    border-left: 2px solid var(--green);
+}
+
+/* Universal data pagination. */
+.app-view .data-pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 36px;
+    gap: 10px;
+    padding: 4px 10px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    background: var(--surface);
+    font-size: 11px;
+}
+.app-view .data-pager[hidden] { display: none !important; }
+.app-view .pager-controls { display: flex; align-items: center; gap: 6px; }
+.app-view .pager-controls label { display: flex; align-items: center; gap: 5px; }
+.app-view .pager-size,
+.app-view .pager-button {
+    height: 26px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--ink);
+    background: var(--surface);
+    font: inherit;
+}
+.app-view .pager-size { min-width: 54px; padding: 0 5px; }
+.app-view .pager-button { width: 26px; padding: 0; cursor: pointer; }
+.app-view .pager-button:hover:not(:disabled) { color: var(--green-dark); background: var(--green-soft); }
+.app-view .pager-button:disabled { opacity: .42; cursor: default; }
+.app-view .pager-page { min-width: 38px; text-align: center; color: var(--ink); font-weight: 500; }
+.app-view .activity-pager { border: 1px solid var(--line); border-top: 0; border-radius: 0 0 8px 8px; }
+
+/* Advanced compact dashboard. */
+.app-view .dashboard-advanced { display: grid; gap: 10px; }
+.app-view .dashboard-commandbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+}
+.app-view .dashboard-commandbar .quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+}
+.app-view .dashboard-commandbar .quick-action {
+    min-width: 0;
+    min-height: 30px;
+    padding: 0 9px;
+    gap: 6px;
+    border-radius: 7px;
+    font-size: 11px;
+}
+.app-view .dashboard-commandbar .quick-action span { width: 18px; height: 18px; font-size: 7px; }
+.app-view .dashboard-period { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
+.app-view .dashboard-period select { height: 30px; border: 1px solid var(--line); border-radius: 7px; padding: 0 26px 0 8px; background: var(--surface); }
+.app-view .dashboard-kpi-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.app-view .kpi-card {
+    min-width: 0;
+    padding: 10px 11px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--surface);
+}
+.app-view .kpi-card > span { display: block; color: var(--muted); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+.app-view .kpi-card > strong { display: block; margin-top: 4px; color: var(--ink); font-size: 16px; font-weight: 600; line-height: 1.2; }
+.app-view .kpi-card > small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-view .dashboard-primary-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(240px, .65fr); gap: 10px; }
+.app-view .dashboard-secondary-grid { display: grid; grid-template-columns: minmax(260px, .65fr) minmax(0, 1.35fr); gap: 10px; }
+.app-view .dashboard-trend-panel,
+.app-view .dashboard-cash-panel,
+.app-view .dashboard-distribution { padding: 10px 12px; }
+.app-view .compact-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.app-view .compact-panel-head h2 { margin: 0; font-size: 13px; font-weight: 500; }
+.app-view .trend-legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; color: var(--muted); font-size: 10px; }
+.app-view .dashboard-trend-panel .trend-chart { height: 138px; }
+.app-view .dashboard-ledger { display: grid; gap: 0; margin: 0; }
+.app-view .dashboard-ledger div { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); }
+.app-view .dashboard-ledger div:first-child { border-top: 0; }
+.app-view .dashboard-ledger dt { color: var(--muted); font-size: 11px; }
+.app-view .dashboard-ledger dd { margin: 0; color: var(--ink); font-size: 12px; font-weight: 500; }
+.app-view .dashboard-latest { align-self: stretch; }
+
+/* Branding mark */
+.app-view .sidebar-brand .brand-mark { font-size: 0; }
+.app-view .sidebar-brand .brand-mark::after { content: 'VR'; font-size: 9px; font-weight: 600; }
+.app-view .sidebar-brand .brand-mark:has(img)::after { content: none; }
+
+@media (max-width: 1180px) {
+    .app-view .dashboard-kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 820px) {
+    .app-view .dashboard-commandbar,
+    .app-view .dashboard-primary-grid,
+    .app-view .dashboard-secondary-grid { grid-template-columns: 1fr; }
+    .app-view .dashboard-period { justify-content: space-between; }
+}
+@media (max-width: 560px) {
+    .app-view .dashboard-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .app-view .data-pager { align-items: flex-start; flex-direction: column; }
+    .app-view .pager-controls { width: 100%; justify-content: flex-end; }
+}
+
+
+/* ========================================================================== */
+/* Final UI R3 — approved Light Professional color system                     */
+/* Source: user-provided UI color suggestion HTML.                            */
+/* ========================================================================== */
+
+:root {
+    --vr-approved-body: #F3F4F6;
+    --vr-approved-surface: #FFFFFF;
+    --vr-approved-text: #1F2937;
+    --vr-approved-muted: #6B7280;
+    --vr-approved-border: #E5E7EB;
+    --vr-approved-primary: #2563EB;
+    --vr-approved-primary-hover: #1D4ED8;
+    --vr-approved-sales: #10B981;
+    --vr-approved-purchase: #3B82F6;
+    --vr-approved-cashflow: #F59E0B;
+    --vr-approved-account: #8B5CF6;
+    --vr-approved-expense: #EF4444;
+    --vr-approved-hover: #F9FAFB;
+    --vr-approved-active: #EFF6FF;
+    --vr-approved-border-hover: #D1D5DB;
+    --vr-approved-paid-soft: #DEF7EC;
+    --vr-approved-paid-text: #03543F;
+    --vr-approved-due-soft: #FDE8E8;
+    --vr-approved-due-text: #9B1C1C;
+}
+
+/* Neutral application foundation. */
+.app-view,
+.login-view,
+.installer-view,
+.license-view {
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-body) !important;
+}
+
+.app-view :where(.panel, .table-panel, .form-panel, .kpi-card, .modal, .toast),
+.app-view .topbar,
+.app-view .sidebar,
+.login-view .login-card,
+.installer-view .card,
+.license-view .license-card {
+    border-color: var(--vr-approved-border);
+    background: var(--vr-approved-surface);
+}
+
+/* Primary action system from the approved reference. */
+.app-view .button-primary,
+.installer-view .button.primary,
+.login-view .button-primary {
+    border-color: var(--vr-approved-primary);
+    color: #FFFFFF;
+    background: var(--vr-approved-primary);
+}
+.app-view .button-primary:hover,
+.installer-view .button.primary:hover,
+.login-view .button-primary:hover {
+    border-color: var(--vr-approved-primary-hover);
+    background: var(--vr-approved-primary-hover);
+}
+.app-view .button-secondary,
+.app-view .row-button,
+.app-view .pager-button,
+.app-view .pager-size {
+    border-color: var(--vr-approved-border);
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-surface);
+}
+.app-view .button-secondary:hover,
+.app-view .row-button:hover,
+.app-view .pager-button:hover:not(:disabled) {
+    border-color: var(--vr-approved-border-hover);
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-body);
+}
+
+/* Sidebar: exact approved neutral hover + light-blue active pattern. */
+.app-view .nav-link,
+.app-view .nav-parent {
+    border: 0;
+    border-left: 3px solid transparent;
+    border-radius: 0;
+    color: var(--vr-approved-muted);
+    background: transparent;
+}
+.app-view .nav-link:hover,
+.app-view .nav-parent:hover {
+    border-left-color: transparent;
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-hover);
+}
+.app-view .nav-link.active,
+.app-view .nav-link.active:hover {
+    border-left-color: var(--vr-approved-primary);
+    color: var(--vr-approved-primary);
+    background: var(--vr-approved-active);
+}
+.app-view .nav-link.active .nav-icon {
+    color: var(--vr-approved-primary);
+    background: transparent;
+}
+.app-view .nav-children a:hover {
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-hover);
+}
+.app-view .nav-children a.active {
+    border-left-color: var(--vr-approved-primary);
+    color: var(--vr-approved-primary);
+    background: var(--vr-approved-active);
+}
+
+/* Topbar actions are neutral; Add New is the single primary CTA. */
+.app-view .outline-pill {
+    border-color: var(--vr-approved-border);
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-surface);
+}
+.app-view .outline-pill:hover {
+    border-color: var(--vr-approved-border-hover);
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-body);
+}
+.app-view #quick-add {
+    border-color: var(--vr-approved-primary);
+    color: #FFFFFF;
+    background: var(--vr-approved-primary);
+}
+.app-view #quick-add:hover {
+    border-color: var(--vr-approved-primary-hover);
+    color: #FFFFFF;
+    background: var(--vr-approved-primary-hover);
+}
+.app-view .support-text { color: var(--vr-approved-muted); }
+.app-view .sidebar-brand .brand-mark,
+.login-view .brand-mark,
+.installer-view .mark { background: var(--vr-approved-sales); }
+.app-view .status-dot { background: var(--vr-approved-sales); }
+
+/* Dashboard action row: neutral by default, one primary action. */
+.app-view .dashboard-commandbar .quick-action {
+    border: 1px solid var(--vr-approved-border);
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-surface) !important;
+}
+.app-view .dashboard-commandbar .quick-action:hover {
+    border-color: var(--vr-approved-border-hover);
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-body) !important;
+}
+.app-view .dashboard-commandbar .quick-action:first-child {
+    border-color: var(--vr-approved-primary);
+    color: #FFFFFF;
+    background: var(--vr-approved-primary) !important;
+}
+.app-view .dashboard-commandbar .quick-action:first-child:hover {
+    border-color: var(--vr-approved-primary-hover);
+    color: #FFFFFF;
+    background: var(--vr-approved-primary-hover) !important;
+}
+.app-view .dashboard-commandbar .quick-action span {
+    color: inherit;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+/* Dashboard KPI cards: white + thin border + semantic left border. */
+.app-view .kpi-card {
+    min-height: 84px;
+    padding: 14px;
+    border: 1px solid var(--vr-approved-border);
+    border-left-width: 4px;
+    border-radius: 6px;
+    background: var(--vr-approved-surface);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .02);
+}
+.app-view .kpi-card.sales { border-left-color: var(--vr-approved-sales); }
+.app-view .kpi-card.purchase { border-left-color: var(--vr-approved-purchase); }
+.app-view .kpi-card.cashflow { border-left-color: var(--vr-approved-cashflow); }
+.app-view .kpi-card.account { border-left-color: var(--vr-approved-account); }
+.app-view .kpi-card.expense,
+.app-view .kpi-card.low-stock { border-left-color: var(--vr-approved-expense); }
+.app-view .kpi-card > span {
+    margin-bottom: 6px;
+    color: var(--vr-approved-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .5px;
+}
+.app-view .kpi-card > strong {
+    margin-top: 0;
+    color: var(--vr-approved-text);
+    font-size: 18px;
+    font-weight: 700;
+}
+.app-view .kpi-card > small {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--vr-approved-border);
+    color: var(--vr-approved-muted);
+    font-size: 11px;
+}
+
+/* Tables from the approved compact reference. */
+.app-view .data-table thead th {
+    color: var(--vr-approved-muted);
+    background: var(--vr-approved-hover);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .5px;
+}
+.app-view .data-table :where(th, td) {
+    border-bottom-color: var(--vr-approved-border);
+    padding: 8px 12px;
+    font-size: 12px;
+}
+.app-view .data-table tbody tr:hover td { background: var(--vr-approved-hover); }
+.app-view .table-search,
+.app-view .form-field :where(input, select, textarea),
+.app-view .dashboard-period select {
+    border-color: var(--vr-approved-border);
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-surface);
+}
+.app-view .table-search:hover,
+.app-view .form-field :where(input, select, textarea):hover {
+    border-color: var(--vr-approved-border-hover);
+    background: var(--vr-approved-surface);
+}
+.app-view .table-search:focus,
+.app-view .form-field :where(input, select, textarea):focus {
+    border-color: var(--vr-approved-primary);
+}
+
+/* Exact semantic badge colors from the approved reference. */
+.app-view .badge:not(.blue):not(.red):not(.gold):not(.gray) {
+    border-color: color-mix(in srgb, var(--vr-approved-sales) 25%, var(--vr-approved-border));
+    color: var(--vr-approved-paid-text);
+    background: var(--vr-approved-paid-soft);
+}
+.app-view .badge.red {
+    border-color: color-mix(in srgb, var(--vr-approved-expense) 25%, var(--vr-approved-border));
+    color: var(--vr-approved-due-text);
+    background: var(--vr-approved-due-soft);
+}
+.app-view .badge.blue {
+    border-color: color-mix(in srgb, var(--vr-approved-purchase) 25%, var(--vr-approved-border));
+    color: var(--vr-approved-purchase);
+    background: color-mix(in srgb, var(--vr-approved-purchase) 8%, var(--vr-approved-surface));
+}
+.app-view .badge.gold {
+    border-color: color-mix(in srgb, var(--vr-approved-cashflow) 25%, var(--vr-approved-border));
+    color: var(--vr-approved-cashflow);
+    background: color-mix(in srgb, var(--vr-approved-cashflow) 8%, var(--vr-approved-surface));
+}
+.app-view .positive { color: var(--vr-approved-sales); }
+.app-view .negative { color: var(--vr-approved-expense); }
+
+/* Financial/dashboard semantic accents. */
+.app-view .financial-bar:not(.purchase):not(.expense) .bar-track i { background: var(--vr-approved-sales); }
+.app-view .financial-bar.purchase .bar-track i { background: var(--vr-approved-purchase); }
+.app-view .financial-bar.expense .bar-track i { background: var(--vr-approved-expense); }
+
+/* Login/setup remain light and neutral; primary blue, identity mark emerald. */
+.login-view .login-art {
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-active);
+}
+.login-view .login-art > p,
+.login-view .eyebrow { color: var(--vr-approved-primary); }
+.login-view .stack-form input:focus,
+.installer-view :where(input, select):focus { border-color: var(--vr-approved-primary); }
+
+
+
+/* -------------------------------------------------------------------------- */
+/* UI-COMPLETE R4 — compact header, working settings navigation, About page   */
+/* -------------------------------------------------------------------------- */
+.app-view .topbar {
+    height: 44px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--vr-approved-border);
+}
+.app-view .topbar-left,
+.app-view .topbar-actions { gap: 6px; }
+.app-view .system-pill,
+.app-view .language-select,
+.app-view .outline-pill,
+.app-view .profile-button,
+.app-view .icon-button {
+    min-height: 28px;
+    height: 28px;
+}
+.app-view .system-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 9px;
+    color: var(--vr-approved-text);
+    text-decoration: none;
+    background: var(--vr-approved-hover);
+}
+.app-view .system-pill:hover { color: var(--vr-approved-primary); background: var(--vr-approved-active); }
+.app-view .language-select { width: 94px; padding-left: 9px; }
+.app-view .support-text { margin-left: 2px; font-size: 11px; }
+.app-view .outline-pill { min-width: 54px; padding: 0 10px; border-radius: 6px; }
+.app-view .profile-button { max-width: 132px; }
+.app-view .profile-button span { width: 26px; height: 26px; flex-basis: 26px; }
+.app-view .profile-button i { max-width: 96px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.app-view .settings-workspace { min-height: 330px; }
+.app-view .settings-section[hidden],
+.app-view .settings-save-actions[hidden] { display: none !important; }
+.app-view .settings-nav { align-self: start; position: sticky; top: 10px; }
+.app-view .settings-nav button { width: 100%; text-align: left; }
+.app-view .settings-nav button.active {
+    border-color: var(--vr-approved-primary);
+    color: var(--vr-approved-primary);
+    background: var(--vr-approved-active);
+}
+.app-view .settings-backup-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px;
+    border: 1px solid var(--vr-approved-border);
+    border-radius: 6px;
+    background: var(--vr-approved-hover);
+}
+.app-view .settings-backup-card p { margin: 4px 0 0; color: var(--vr-approved-muted); font-size: 12px; line-height: 1.5; }
+.app-view .settings-toggle-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+
+.app-view .developer-credit a[data-page="about"] { color: var(--vr-approved-primary); font-weight: 600; }
+
+.app-view .about-hero {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px;
+    border-left: 4px solid var(--vr-approved-primary);
+}
+.app-view .about-mark {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    color: #FFFFFF;
+    background: var(--vr-approved-primary);
+    font-size: 15px;
+    font-weight: 700;
+}
+.app-view .about-hero h2,
+.app-view .about-company h2 { margin: 4px 0 6px; font-size: 18px; font-weight: 600; color: var(--vr-approved-text); }
+.app-view .about-hero p,
+.app-view .about-company p,
+.app-view .about-grid p { margin: 0; color: var(--vr-approved-muted); font-size: 12px; line-height: 1.6; }
+.app-view .about-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.app-view .about-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+.app-view .about-grid h3 { margin: 8px 0 5px; font-size: 13px; font-weight: 600; }
+.app-view .about-icon { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; color: var(--vr-approved-primary); background: var(--vr-approved-active); font-size: 9px; font-weight: 700; }
+.app-view .about-company { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: 24px; margin-top: 10px; }
+.app-view .about-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.app-view .about-meta div { padding: 10px; border: 1px solid var(--vr-approved-border); border-radius: 6px; background: var(--vr-approved-hover); }
+.app-view .about-meta span { display: block; color: var(--vr-approved-muted); font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+.app-view .about-meta strong { display: block; margin-top: 3px; font-size: 12px; font-weight: 600; }
+
+@media (max-width: 760px) {
+    .app-view .support-text { display: none; }
+    .app-view .about-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .app-view .about-company { grid-template-columns: 1fr; }
+    .app-view .settings-toggle-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+    .app-view .language-select { display: none; }
+    .app-view .about-hero { grid-template-columns: 1fr; }
+    .app-view .about-grid { grid-template-columns: 1fr; }
+}
+/* -------------------------------------------------------------------------- */
+/* UI-COMPLETE R5 — persistent company footer + corrected compact header      */
+/* -------------------------------------------------------------------------- */
+.app-view .sidebar {
+    height: 100vh;
+    overflow: hidden;
+}
+.app-view .sidebar-nav {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.app-view .sidebar-foot {
+    flex: 0 0 auto;
+    display: grid;
+    gap: 3px;
+    min-height: 48px;
+    padding: 7px 10px 8px;
+    border-top: 1px solid var(--vr-approved-border);
+    color: var(--vr-approved-muted);
+    background: var(--vr-approved-surface);
+}
+.app-view .company-note {
+    color: var(--vr-approved-muted);
+    font-size: 9.5px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+.app-view .company-links {
+    font-size: 9.5px;
+    line-height: 1.35;
+}
+.app-view .company-links a {
+    color: var(--vr-approved-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+.app-view .company-links a:hover { text-decoration: underline; }
+
+.app-view .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 10px;
+}
+.app-view .topbar-left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 6px;
+}
+.app-view .topbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: max-content;
+    margin-left: auto;
+}
+.app-view .topbar-menu-anchor {
+    display: flex;
+    align-items: center;
+    height: 28px;
+}
+.app-view .outline-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 54px;
+    height: 28px;
+    padding: 0 11px;
+    border-radius: 6px;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.app-view #quick-add {
+    min-width: 82px;
+}
+.app-view .profile-button {
+    width: 28px;
+    min-width: 28px;
+    max-width: 28px;
+    height: 28px;
+    overflow: visible;
+}
+.app-view .profile-button span {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+}
+.app-view .profile-button i { display: none !important; }
+
+.app-view .whatsapp-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 6px;
+    border-radius: 6px;
+    color: var(--vr-approved-muted);
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.app-view .whatsapp-link:hover {
+    color: var(--vr-approved-sales);
+    background: var(--vr-approved-hover);
+}
+.app-view .whatsapp-link svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.app-view .brand-mark {
+    overflow: hidden;
+    background: var(--vr-approved-surface);
+    border: 1px solid var(--vr-approved-border);
+}
+.app-view .brand-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.app-view .about-brand-logo {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    overflow: hidden;
+    border: 1px solid var(--vr-approved-border);
+    border-radius: 10px;
+    background: var(--vr-approved-surface);
+}
+.app-view .about-brand-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.app-view .about-contact {
+    display: grid;
+    grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr);
+    gap: 18px;
+    margin-top: 10px;
+}
+.app-view .about-contact-copy h2 {
+    margin: 4px 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+}
+.app-view .about-contact-copy p {
+    margin: 0;
+    color: var(--vr-approved-muted);
+    font-size: 12px;
+    line-height: 1.55;
+}
+.app-view .about-contact-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+.app-view .about-contact-grid > a {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 52px;
+    padding: 9px 10px;
+    border: 1px solid var(--vr-approved-border);
+    border-radius: 6px;
+    color: var(--vr-approved-text);
+    background: var(--vr-approved-hover);
+    text-decoration: none;
+}
+.app-view .about-contact-grid > a:hover {
+    border-color: var(--vr-approved-primary);
+    background: var(--vr-approved-active);
+}
+.app-view .about-contact-grid span,
+.app-view .about-contact-grid small {
+    color: var(--vr-approved-muted);
+    font-size: 10px;
+}
+.app-view .about-contact-grid strong {
+    margin-top: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.app-view .about-contact-grid .about-whatsapp {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 9px;
+}
+.app-view .about-whatsapp svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    fill: none;
+    stroke: var(--vr-approved-sales);
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.app-view .about-whatsapp span { display: grid; }
+.app-view .about-whatsapp strong { margin-top: 1px; color: var(--vr-approved-text); }
+.app-view .about-socials {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+}
+.app-view .about-socials a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 0 9px;
+    border: 1px solid var(--vr-approved-border);
+    border-radius: 6px;
+    color: var(--vr-approved-primary);
+    background: var(--vr-approved-surface);
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.app-view .about-socials a:hover {
+    border-color: var(--vr-approved-primary);
+    background: var(--vr-approved-active);
+}
+
+@media (max-width: 940px) {
+    .app-view .whatsapp-link span { display: none; }
+    .app-view .whatsapp-link { width: 28px; justify-content: center; padding: 0; }
+}
+@media (max-width: 760px) {
+    .app-view .about-contact { grid-template-columns: 1fr; }
+    .app-view .about-socials { grid-column: auto; }
+}
+@media (max-width: 520px) {
+    .app-view .topbar { padding: 0 7px; }
+    .app-view #quick-add { min-width: 70px; padding-inline: 8px; }
+    .app-view .about-contact-grid { grid-template-columns: 1fr; }
+}

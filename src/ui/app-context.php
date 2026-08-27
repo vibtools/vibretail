@@ -9,7 +9,7 @@ if (!isset($pageKey, $pageTitle, $pageSubtitle, $pageSection)) {
 
 try {
     $pdo = db();
-    $settings = $pdo->query('SELECT * FROM settings WHERE id = 1')->fetch() ?: [];
+    $settings = normalize_brand_settings($pdo->query('SELECT * FROM settings WHERE id = 1')->fetch() ?: []);
 } catch (Throwable) {
     header('Location: install.php');
     exit;
@@ -37,4 +37,4 @@ if (!$user) {
     exit;
 }
 
-$businessName = $settings['business_name'] ?? SOFTWARE_NAME;
+$businessName = (string) ($settings['business_name'] ?? SOFTWARE_NAME);

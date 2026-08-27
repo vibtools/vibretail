@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS settings (
     id TINYINT UNSIGNED PRIMARY KEY DEFAULT 1,
-    business_name VARCHAR(160) NOT NULL DEFAULT 'Cloud Core POS',
+    business_name VARCHAR(160) NOT NULL DEFAULT 'VibRetail',
     phone VARCHAR(30) DEFAULT '',
     email VARCHAR(120) DEFAULT '',
     address VARCHAR(255) DEFAULT '',

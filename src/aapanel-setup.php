@@ -9,7 +9,7 @@ if (PHP_SAPI !== 'cli') {
 function setup_help(): never
 {
     echo <<<TEXT
-Cloud Core POS aaPanel setup
+VibRetail aaPanel setup
 
 Usage:
   php aapanel-setup.php [options]
@@ -110,7 +110,7 @@ if (isset($options['help'])) {
 }
 
 if (version_compare(PHP_VERSION, '8.1.0', '<')) {
-    fwrite(STDERR, 'Cloud Core POS requires PHP 8.1 or newer. PHP 8.3 is recommended.' . PHP_EOL);
+    fwrite(STDERR, 'VibRetail requires PHP 8.1 or newer. PHP 8.3 is recommended.' . PHP_EOL);
     exit(1);
 }
 $missingExtensions = array_values(array_filter(['pdo', 'pdo_mysql', 'mbstring', 'openssl', 'json', 'gd', 'exif'], static fn(string $extension): bool => !extension_loaded($extension)));

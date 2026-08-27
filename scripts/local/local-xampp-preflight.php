@@ -85,7 +85,7 @@ $failed = array_values(array_filter($checks, static fn(array $row): bool => !$ro
 
 if ($asJson) {
     echo json_encode([
-        'project' => 'Cloud Core POS',
+        'project' => 'VibRetail',
         'candidate' => 'CCPOS-P2-2026.08.27-001',
         'scope_lock' => 'CCPOS-LX-SL-001',
         'php' => PHP_VERSION,
@@ -94,7 +94,7 @@ if ($asJson) {
         'environment' => local_gate_redacted_environment(),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
 } else {
-    echo "Cloud Core POS - Local XAMPP Preflight\n";
+    echo "VibRetail - Local XAMPP Preflight\n";
     echo "Candidate: CCPOS-EZ-2026.08.27-001\n";
     echo "Service key fingerprint: " . local_gate_service_key_fingerprint() . " (safe fingerprint, not the key)\n\n";
     foreach ($checks as $row) {

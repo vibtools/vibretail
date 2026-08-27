@@ -1,19 +1,33 @@
 :root {
-    --green: #00b96b;
-    --green-dark: #008f55;
-    --green-soft: #ddf9ec;
-    --blue: #1769ef;
-    --purple: #8d23e8;
-    --orange: #ec8700;
-    --red: #f20d4f;
-    --teal: #00a997;
-    --ink: #15211d;
-    --muted: #6b7973;
-    --line: #e7eeeb;
-    --surface: #ffffff;
-    --canvas: #f5f8f7;
+    /* VibRetail approved Light Professional palette — sourced from the user-provided UI color reference. */
+    --green: #2563EB;
+    --green-dark: #1D4ED8;
+    --green-soft: #EFF6FF;
+    --blue: #3B82F6;
+    --purple: #8B5CF6;
+    --orange: #F59E0B;
+    --red: #EF4444;
+    --teal: #10B981;
+    --ink: #1F2937;
+    --muted: #6B7280;
+    --line: #E5E7EB;
+    --surface: #FFFFFF;
+    --canvas: #F3F4F6;
 
-    /* VibRetail UI-01 structural foundation. Theme/color values above are frozen. */
+    --vr-color-sales: #10B981;
+    --vr-color-purchase: #3B82F6;
+    --vr-color-cashflow: #F59E0B;
+    --vr-color-account: #8B5CF6;
+    --vr-color-expense: #EF4444;
+    --vr-color-nav-hover: #F9FAFB;
+    --vr-color-nav-active: #EFF6FF;
+    --vr-color-border-hover: #D1D5DB;
+    --vr-color-paid-soft: #DEF7EC;
+    --vr-color-paid-text: #03543F;
+    --vr-color-due-soft: #FDE8E8;
+    --vr-color-due-text: #9B1C1C;
+
+    /* VibRetail UI structural foundation. Palette above is the approved Light Professional color system. */
     --vr-color-primary: var(--green);
     --vr-color-primary-strong: var(--green-dark);
     --vr-color-primary-soft: var(--green-soft);

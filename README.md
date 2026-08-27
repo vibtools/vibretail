@@ -1,8 +1,8 @@
 # VibRetail — Repository Structure
 
-VibRetail is the locked working name for the modernization repository built from the current Cloud Core POS codebase. This root README intentionally documents repository structure only, following the Vib Tools VibProject standard.
+VibRetail is the official product identity for this retail operations repository. This root README intentionally documents repository structure only, following the Vib Tools VibProject standard.
 
-> **Branding/license transition:** the bundled runtime still carries the existing Cloud Core POS software name and protected attribution under its current license. Public rebranding to VibRetail must not be completed until the applicable rights/license are explicitly resolved.
+> **Branding:** VibRetail by Vib Tools is the authorized product identity. The bundled non-commercial attribution license terms remain in force.
 
 ## Repository Structure
 

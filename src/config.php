@@ -81,12 +81,54 @@ date_default_timezone_set(env_value('POS_TIMEZONE', 'Asia/Dhaka'));
 define('APP_ENV', env_value('POS_APP_ENV', 'local'));
 define('PLATFORM_ENV_FILE', $activeEnvFile);
 define('IS_WINDOWS', PHP_OS_FAMILY === 'Windows');
-define('SOFTWARE_NAME', 'Cloud Core POS');
-define('DEVELOPER_NAME', 'Swapon Mahmud');
-define('DEVELOPER_COMPANY', 'Cloudcore Soft');
-define('DEVELOPER_COMPANY_URL', 'https://cloudcoresoft.com');
-define('DEVELOPER_FACEBOOK_URL', 'https://fb.com/bapa.swapon');
-define('DEVELOPER_GITHUB_URL', 'https://github.com/swaponmahmud');
+define('SOFTWARE_NAME', 'VibRetail');
+define('DEVELOPER_NAME', 'Vib Tools');
+define('DEVELOPER_COMPANY', 'Vib Tools');
+define('DEVELOPER_COMPANY_URL', 'https://vib.tools/');
+define('DEVELOPER_CONTACT_URL', 'https://vib.tools/contact');
+define('DEVELOPER_LOGO_URL', 'https://vibtools.github.io/vibtools-brand-assets/logos/icon-512.png');
+define('DEVELOPER_GITHUB_URL', 'https://github.com/vibtools/vibretail');
+define('DEVELOPER_GITHUB_ORG_URL', 'https://github.com/vibtools');
+define('DEVELOPER_FACEBOOK_URL', 'https://www.facebook.com/vib.tools');
+define('DEVELOPER_X_URL', 'https://x.com/vibtools');
+define('DEVELOPER_INSTAGRAM_URL', 'https://www.instagram.com/vib.tools');
+define('DEVELOPER_REDDIT_URL', 'https://www.reddit.com/user/VibTools/');
+define('DEVELOPER_EMAIL', 'hello@vib.tools');
+define('DEVELOPER_SUPPORT_EMAIL', 'support@vib.tools');
+define('DEVELOPER_WHATSAPP_NUMBER', '+880 1795-470603');
+define('DEVELOPER_WHATSAPP_URL', 'https://wa.me/8801795470603');
+
+
+function normalize_brand_settings(array $settings): array
+{
+    $businessName = trim((string) ($settings['business_name'] ?? ''));
+    if ($businessName === '' || strcasecmp($businessName, 'Cloud Core POS') === 0) {
+        $settings['business_name'] = SOFTWARE_NAME;
+    }
+
+    $tagline = trim((string) ($settings['tagline'] ?? ''));
+    $legacyTaglines = [
+        'Developed by Swapon Mahmud',
+        'Cloud Core POS',
+        'Cloudcore Soft',
+        'Modern retail operations by Vib Tools',
+    ];
+    if ($tagline === '' || in_array($tagline, $legacyTaglines, true)) {
+        $settings['tagline'] = 'Retail operations, simplified by Vib Tools.';
+    }
+
+    $website = trim((string) ($settings['website'] ?? ''));
+    $legacyWebsites = [
+        'https://cloudcoresoft.com',
+        'http://cloudcoresoft.com',
+        'cloudcoresoft.com',
+    ];
+    if ($website === '' || in_array(strtolower(rtrim($website, '/')), array_map(static fn(string $value): string => strtolower(rtrim($value, '/')), $legacyWebsites), true)) {
+        $settings['website'] = DEVELOPER_COMPANY_URL;
+    }
+
+    return $settings;
+}
 define('DB_HOST', env_value('POS_DB_HOST', '127.0.0.1'));
 define('DB_PORT', max(1, min(65535, (int) env_value('POS_DB_PORT', '3306'))));
 define('DB_NAME', env_value('POS_DB_NAME', 'pos'));
@@ -357,7 +399,7 @@ function send_security_headers(): void
     if (request_is_https()) {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains', true);
     }
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-" . security_nonce() . "'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'", true);
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-" . security_nonce() . "'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://vibtools.github.io; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'", true);
 }
 
 send_security_headers();

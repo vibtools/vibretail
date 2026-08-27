@@ -4,7 +4,7 @@
     const config = window.POS_CONFIG || {};
     const state = {
         bootstrap: null,
-        settings: { currency: config.currency || 'BDT', business_name: config.businessName || 'Cloud Core POS' },
+        settings: { currency: config.currency || 'BDT', business_name: config.businessName || 'VibRetail' },
         transactionItems: [],
         quotationItems: [],
         editProduct: null,
@@ -97,7 +97,7 @@
     }
 
     function pageHeader(title, subtitle, section = 'ERP', actions = '') {
-        return `<header class="page-header"><div><span class="breadcrumb">${esc(section)}</span><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div><div class="header-actions">${actions}</div></header>`;
+        return `<header class="page-header"><div><span class="breadcrumb">${esc(section)}</span><h1>${esc(title)}</h1></div><div class="header-actions">${actions}</div></header>`;
     }
 
     function badge(status) {
@@ -133,13 +133,90 @@
         return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = () => reject(new Error('Could not read the selected image.')); reader.readAsDataURL(file); });
     }
 
+    const paginationRegistry = new WeakMap();
+    const PAGINATION_DEFAULT = 20;
+
+    function tableRows(table) {
+        return $$('tbody tr', table).filter((row) => !row.classList.contains('empty-row'));
+    }
+
+    function refreshTablePagination(table, resetPage = false) {
+        const pager = paginationRegistry.get(table);
+        if (!pager) return;
+        const rows = tableRows(table);
+        const matched = rows.filter((row) => row.dataset.searchMatch !== '0');
+        if (resetPage) pager.page = 1;
+        const pageSize = pager.pageSize;
+        const pages = Math.max(1, Math.ceil(matched.length / pageSize));
+        pager.page = Math.min(pager.page, pages);
+        const start = (pager.page - 1) * pageSize;
+        const end = Math.min(matched.length, start + pageSize);
+        rows.forEach((row) => { row.hidden = true; });
+        matched.slice(start, end).forEach((row) => { row.hidden = false; });
+        pager.node.hidden = matched.length <= pageSize;
+        pager.range.textContent = matched.length ? `${start + 1}–${end} of ${matched.length}` : '0 records';
+        pager.prev.disabled = pager.page <= 1;
+        pager.next.disabled = pager.page >= pages;
+        pager.pageLabel.textContent = `${pager.page} / ${pages}`;
+    }
+
+    function enhanceTablePagination(table) {
+        if (!table || table.dataset.pagination === 'off' || paginationRegistry.has(table)) return;
+        const rows = tableRows(table);
+        rows.forEach((row) => { if (!row.dataset.searchMatch) row.dataset.searchMatch = '1'; });
+        const node = document.createElement('div');
+        node.className = 'data-pager';
+        node.innerHTML = `<span class="pager-range"></span><div class="pager-controls"><label>Rows <select class="pager-size"><option>10</option><option selected>20</option><option>50</option></select></label><button class="pager-button pager-prev" type="button" aria-label="Previous page">‹</button><span class="pager-page"></span><button class="pager-button pager-next" type="button" aria-label="Next page">›</button></div>`;
+        const panel = table.closest('.table-panel');
+        const wrap = table.closest('.table-wrap');
+        (panel || wrap?.parentElement || table.parentElement).append(node);
+        const pager = { node, page: 1, pageSize: PAGINATION_DEFAULT, range: $('.pager-range', node), pageLabel: $('.pager-page', node), prev: $('.pager-prev', node), next: $('.pager-next', node), size: $('.pager-size', node) };
+        paginationRegistry.set(table, pager);
+        pager.prev.addEventListener('click', () => { pager.page--; refreshTablePagination(table); });
+        pager.next.addEventListener('click', () => { pager.page++; refreshTablePagination(table); });
+        pager.size.addEventListener('change', () => { pager.pageSize = Number(pager.size.value) || PAGINATION_DEFAULT; refreshTablePagination(table, true); });
+        refreshTablePagination(table);
+    }
+
+    function enhanceActivityPagination(list) {
+        if (!list || list.dataset.paginationReady) return;
+        const items = $$('.activity-item', list);
+        list.dataset.paginationReady = '1';
+        if (items.length <= 10) return;
+        let page = 1; const pageSize = 10; const pages = Math.ceil(items.length / pageSize);
+        const pager = document.createElement('div'); pager.className = 'data-pager activity-pager';
+        pager.innerHTML = `<span class="pager-range"></span><div class="pager-controls"><button class="pager-button pager-prev" type="button">‹</button><span class="pager-page"></span><button class="pager-button pager-next" type="button">›</button></div>`;
+        list.after(pager);
+        const render = () => { const a=(page-1)*pageSize,b=Math.min(items.length,a+pageSize); items.forEach((item,i)=>{item.hidden=i<a||i>=b;}); $('.pager-range',pager).textContent=`${a+1}–${b} of ${items.length}`; $('.pager-page',pager).textContent=`${page} / ${pages}`; $('.pager-prev',pager).disabled=page===1; $('.pager-next',pager).disabled=page===pages; };
+        $('.pager-prev',pager).addEventListener('click',()=>{page=Math.max(1,page-1);render();}); $('.pager-next',pager).addEventListener('click',()=>{page=Math.min(pages,page+1);render();}); render();
+    }
+
+    function finalizePageUi(root = document) {
+        $$('.panel-title p, .table-toolbar > div > p, .page-header p', root).forEach((node) => node.remove());
+        $$('.data-table', root).forEach(enhanceTablePagination);
+        $$('.activity-list', root).forEach(enhanceActivityPagination);
+    }
+
+    let uiFinalizeQueued = false;
+    function scheduleFinalizePageUi() {
+        if (uiFinalizeQueued) return;
+        uiFinalizeQueued = true;
+        requestAnimationFrame(() => {
+            uiFinalizeQueued = false;
+            finalizePageUi(content());
+            finalizePageUi($('#modal-root'));
+        });
+    }
+
     function bindSearch(inputSelector, tableSelector) {
         const input = $(inputSelector);
         const table = $(tableSelector);
         if (!input || !table) return;
+        enhanceTablePagination(table);
         input.addEventListener('input', () => {
             const query = input.value.trim().toLowerCase();
-            $$('tbody tr', table).forEach((row) => { row.hidden = query && !row.textContent.toLowerCase().includes(query); });
+            tableRows(table).forEach((row) => { row.dataset.searchMatch = (!query || row.textContent.toLowerCase().includes(query)) ? '1' : '0'; });
+            refreshTablePagination(table, true);
         });
     }
 
@@ -148,6 +225,7 @@
         const close = () => { $('#modal-root').innerHTML = ''; };
         $('.modal-close')?.addEventListener('click', close);
         $('.modal-backdrop')?.addEventListener('click', (event) => { if (event.target.classList.contains('modal-backdrop')) close(); });
+        finalizePageUi($('#modal-root'));
         return close;
     }
 
@@ -155,6 +233,7 @@
         const data = await api('bootstrap');
         state.bootstrap = data;
         state.settings = data.settings || state.settings;
+        if (state.settings.business_name === 'Cloud Core POS') state.settings.business_name = 'VibRetail';
         const business = $('#sidebar-business');
         if (business) business.textContent = state.settings.business_name;
         return data;
@@ -178,36 +257,36 @@
             const y = height - pad - (num(p[key]) / max * (height - pad * 2));
             return `${index ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`;
         }).join(' ');
-        return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Last 30 days trend"><defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00b96b" stop-opacity=".23"/><stop offset="1" stop-color="#00b96b" stop-opacity="0"/></linearGradient></defs><path d="${line('sales')} L${width - pad},${height - pad} L${pad},${height - pad} Z" fill="url(#area)"/><path d="${line('sales')}" fill="none" stroke="#00b96b" stroke-width="3"/><path d="${line('purchases')}" fill="none" stroke="#1769ef" stroke-width="2"/><path d="${line('expenses')}" fill="none" stroke="#f20d4f" stroke-width="2"/></svg>`;
+        return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Last 30 days trend"><defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10B981" stop-opacity=".16"/><stop offset="1" stop-color="#10B981" stop-opacity="0"/></linearGradient></defs><path d="${line('sales')} L${width - pad},${height - pad} L${pad},${height - pad} Z" fill="url(#area)"/><path d="${line('sales')}" fill="none" stroke="#10B981" stroke-width="2"/><path d="${line('purchases')}" fill="none" stroke="#3B82F6" stroke-width="2"/><path d="${line('expenses')}" fill="none" stroke="#EF4444" stroke-width="2"/></svg>`;
     }
 
     async function renderDashboard(period = 'today') {
         loading();
         const data = await api('dashboard', { params: { period } });
-        const saleTotal = num(data.sales.total), purchaseTotal = num(data.purchases.total);
-        const salePercent = saleTotal ? Math.min(100, num(data.sales.paid) / saleTotal * 100) : 0;
-        const purchasePercent = purchaseTotal ? Math.min(100, num(data.purchases.paid) / purchaseTotal * 100) : 0;
-        const cashTotal = num(data.cash_in) + num(data.cash_out);
-        const cashPercent = cashTotal ? num(data.cash_out) / cashTotal * 100 : 0;
-        const maxFinancial = Math.max(1, saleTotal, purchaseTotal, num(data.expenses));
+        const sales = num(data.sales.total), purchases = num(data.purchases.total), expenses = num(data.expenses);
+        const cashNet = num(data.cash_in) - num(data.cash_out);
         const trendSales = data.trend.reduce((sum, item) => sum + num(item.sales), 0);
         const trendPurchases = data.trend.reduce((sum, item) => sum + num(item.purchases), 0);
         const trendExpenses = data.trend.reduce((sum, item) => sum + num(item.expenses), 0);
-        content().innerHTML = `<div class="page-enter">
-            ${quickActions()}
-            <div class="filter-bar"><span class="filter-icon">DT</span><select id="dashboard-period"><option value="today">Today</option><option value="last_30">Last 30 Days</option><option value="week">This Week</option><option value="last_week">Last Week</option><option value="month">This Month</option><option value="last_month">Last Month</option><option value="year">This Year</option></select><span class="filter-spacer"></span><span class="muted">${formatDate(data.period.from)} - ${formatDate(data.period.to)}</span></div>
-            <div class="stat-grid">
-                <article class="stat-card"><div class="stat-top"><span class="stat-icon">SALE</span><strong class="stat-count">${esc(data.sales.count)}</strong></div><p class="stat-label">Sales</p><h2 class="stat-value">${formatMoney(data.sales.total)}</h2><div class="stat-row"><span>Paid</span><strong class="in">${formatMoney(data.sales.paid)}</strong></div><div class="stat-row"><span>Due</span><strong class="out">${formatMoney(data.sales.due)}</strong></div><div class="progress"><i style="width:${salePercent}%"></i></div><div class="stat-row"><span></span><span>${salePercent.toFixed(1)}% Collected</span></div></article>
-                <article class="stat-card blue"><div class="stat-top"><span class="stat-icon">BUY</span><strong class="stat-count">${esc(data.purchases.count)}</strong></div><p class="stat-label">Purchase</p><h2 class="stat-value">${formatMoney(data.purchases.total)}</h2><div class="stat-row"><span>Paid</span><strong class="in">${formatMoney(data.purchases.paid)}</strong></div><div class="stat-row"><span>Due</span><strong class="out">${formatMoney(data.purchases.due)}</strong></div><div class="progress"><i style="width:${purchasePercent}%;background:#1769ef"></i></div><div class="stat-row"><span></span><span>${purchasePercent.toFixed(1)}% Paid</span></div></article>
-                <article class="stat-card gold"><div class="stat-top"><span class="stat-icon">CASH</span><strong class="stat-count">${data.cash_in ? '+' : '0'}</strong></div><p class="stat-label">Cash Flow</p><h2 class="stat-value">${formatMoney(num(data.cash_in) - num(data.cash_out))}</h2><div class="stat-row"><span>Received</span><strong class="in">${formatMoney(data.cash_in)}</strong></div><div class="stat-row"><span>Paid Out</span><strong class="out">${formatMoney(data.cash_out)}</strong></div><div class="progress"><i style="width:${cashPercent}%;background:#e6a900"></i></div><div class="stat-row"><span></span><span>${cashPercent.toFixed(1)}% Paid</span></div></article>
-                <article class="stat-card violet"><div class="stat-top"><span class="stat-icon">ACC</span><span class="badge ${data.low_stock ? 'red' : ''}">${data.low_stock} low stock</span></div><p class="stat-label">Account</p><h2 class="stat-value">${formatMoney(data.account_balance)}</h2><div class="stat-row"><span>Service Paid</span><strong class="in">${formatMoney(data.service_paid)}</strong></div><div class="stat-row"><span>Expense</span><strong class="out">${formatMoney(data.expenses)}</strong></div><div class="progress"><i style="width:${data.low_stock ? 35 : 100}%;background:#8d23e8"></i></div><div class="stat-row"><span></span><span>Live balance</span></div></article>
-            </div>
-            <div class="mini-grid"><div class="mini-card"><span>SI</span><p>Sale Invoice (${data.sales.count})<strong>${formatMoney(data.sales.total)}</strong></p></div><div class="mini-card"><span>PI</span><p>Purchase Invoice (${data.purchases.count})<strong>${formatMoney(data.purchases.total)}</strong></p></div><div class="mini-card"><span>CF</span><p>Cash Flow<strong>${formatMoney(num(data.cash_in) - num(data.cash_out))}</strong></p></div><div class="mini-card"><span>EX</span><p>Expense<strong>${formatMoney(data.expenses)}</strong></p></div><div class="mini-card"><span>SV</span><p>Service Paid<strong>${formatMoney(data.service_paid)}</strong></p></div></div>
-            <div class="dashboard-lower">
-                <section class="panel panel-pad"><div class="panel-head"><div class="panel-title"><span>FD</span><div><h3>Financial Distribution</h3><p>Sales vs Purchases vs Expenses</p></div></div></div><div class="financial-bars"><div class="financial-bar"><label><span>Sales</span><strong>${formatMoney(saleTotal)}</strong></label><div class="bar-track"><i style="width:${saleTotal / maxFinancial * 100}%"></i></div></div><div class="financial-bar purchase"><label><span>Purchases</span><strong>${formatMoney(purchaseTotal)}</strong></label><div class="bar-track"><i style="width:${purchaseTotal / maxFinancial * 100}%"></i></div></div><div class="financial-bar expense"><label><span>Expenses</span><strong>${formatMoney(data.expenses)}</strong></label><div class="bar-track"><i style="width:${num(data.expenses) / maxFinancial * 100}%"></i></div></div></div></section>
-                <section class="panel panel-pad"><div class="panel-head"><div class="panel-title"><span>TR</span><div><h3>Last 30 Days Trend</h3><p>Daily business movement</p></div></div></div><div class="trend-summary"><div><small>Total Sales</small><strong>${formatMoney(trendSales)}</strong></div><div><small>Total Purchases</small><strong>${formatMoney(trendPurchases)}</strong></div><div><small>Total Expenses</small><strong>${formatMoney(trendExpenses)}</strong></div><div><small>Avg. Sales</small><strong>${formatMoney(trendSales / 30)}</strong></div></div><div class="trend-chart">${trendSvg(data.trend)}</div></section>
-            </div>
-            <section class="panel table-panel"><div class="table-toolbar"><div><h2>Latest Invoice</h2><p>Most recent sale activity</p></div><button class="button button-secondary" data-page="sale-list">View All</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Customer</th><th>Invoice</th><th>Date</th><th>Amount</th><th>Paid</th><th>Due</th><th>Status</th></tr></thead><tbody>${data.latest.length ? data.latest.map((row) => `<tr><td><strong>${esc(row.customer)}</strong></td><td>${esc(row.invoice_no)}</td><td>${formatDate(row.sale_date)}</td><td>${formatMoney(row.total)}</td><td class="positive">${formatMoney(row.paid)}</td><td class="negative">${formatMoney(row.due)}</td><td>${badge(num(row.due) ? 'Due' : 'Paid')}</td></tr>`).join('') : emptyRows(7, 'No sales have been created yet.')}</tbody></table></div></section>
+        const maxFinancial = Math.max(1, sales, purchases, expenses);
+        content().innerHTML = `<div class="page-enter dashboard-advanced">
+            <div class="dashboard-commandbar">${quickActions()}<div class="dashboard-period"><select id="dashboard-period"><option value="today">Today</option><option value="last_30">Last 30 Days</option><option value="week">This Week</option><option value="last_week">Last Week</option><option value="month">This Month</option><option value="last_month">Last Month</option><option value="year">This Year</option></select><span>${formatDate(data.period.from)} – ${formatDate(data.period.to)}</span></div></div>
+            <section class="dashboard-kpi-grid">
+                <article class="kpi-card sales"><span>Sales</span><strong>${formatMoney(sales)}</strong><small>${esc(data.sales.count)} invoices · Due ${formatMoney(data.sales.due)}</small></article>
+                <article class="kpi-card purchase"><span>Purchases</span><strong>${formatMoney(purchases)}</strong><small>${esc(data.purchases.count)} invoices · Due ${formatMoney(data.purchases.due)}</small></article>
+                <article class="kpi-card cashflow"><span>Cash Net</span><strong class="${cashNet < 0 ? 'negative' : 'positive'}">${formatMoney(cashNet)}</strong><small>In ${formatMoney(data.cash_in)} · Out ${formatMoney(data.cash_out)}</small></article>
+                <article class="kpi-card expense"><span>Expenses</span><strong>${formatMoney(expenses)}</strong><small>Selected period</small></article>
+                <article class="kpi-card account"><span>Account Balance</span><strong>${formatMoney(data.account_balance)}</strong><small>Service paid ${formatMoney(data.service_paid)}</small></article>
+                <article class="kpi-card low-stock"><span>Low Stock</span><strong class="${data.low_stock ? 'negative' : ''}">${esc(data.low_stock)}</strong><small>Products at alert level</small></article>
+            </section>
+            <section class="dashboard-primary-grid">
+                <article class="panel dashboard-trend-panel"><div class="compact-panel-head"><h2>30-Day Business Trend</h2><div class="trend-legend"><span>Sales ${formatMoney(trendSales)}</span><span>Purchase ${formatMoney(trendPurchases)}</span><span>Expense ${formatMoney(trendExpenses)}</span></div></div><div class="trend-chart">${trendSvg(data.trend)}</div></article>
+                <article class="panel dashboard-cash-panel"><div class="compact-panel-head"><h2>Cash Position</h2></div><dl class="dashboard-ledger"><div><dt>Cash received</dt><dd>${formatMoney(data.cash_in)}</dd></div><div><dt>Cash paid</dt><dd>${formatMoney(data.cash_out)}</dd></div><div><dt>Net cash</dt><dd>${formatMoney(cashNet)}</dd></div><div><dt>Account balance</dt><dd>${formatMoney(data.account_balance)}</dd></div></dl></article>
+            </section>
+            <section class="dashboard-secondary-grid">
+                <article class="panel dashboard-distribution"><div class="compact-panel-head"><h2>Financial Distribution</h2></div><div class="financial-bars"><div class="financial-bar"><label><span>Sales</span><strong>${formatMoney(sales)}</strong></label><div class="bar-track"><i style="width:${sales/maxFinancial*100}%"></i></div></div><div class="financial-bar purchase"><label><span>Purchases</span><strong>${formatMoney(purchases)}</strong></label><div class="bar-track"><i style="width:${purchases/maxFinancial*100}%"></i></div></div><div class="financial-bar expense"><label><span>Expenses</span><strong>${formatMoney(expenses)}</strong></label><div class="bar-track"><i style="width:${expenses/maxFinancial*100}%"></i></div></div></div></article>
+                <article class="panel table-panel dashboard-latest"><div class="table-toolbar"><div><h2>Recent Sales</h2></div><button class="button button-secondary" data-page="sale-list">View All</button></div><div class="table-wrap"><table class="data-table" data-pagination="off"><thead><tr><th>Customer</th><th>Invoice</th><th>Date</th><th>Total</th><th>Due</th><th>Status</th></tr></thead><tbody>${data.latest.length ? data.latest.map((row)=>`<tr><td><strong>${esc(row.customer)}</strong></td><td>${esc(row.invoice_no)}</td><td>${formatDate(row.sale_date)}</td><td>${formatMoney(row.total)}</td><td class="${num(row.due)?'negative':''}">${formatMoney(row.due)}</td><td>${badge(num(row.due)?'Due':'Paid')}</td></tr>`).join('') : emptyRows(6,'No sales yet.')}</tbody></table></div></article>
+            </section>
         </div>`;
         $('#dashboard-period').value = period;
         $('#dashboard-period').addEventListener('change', (event) => renderDashboard(event.target.value).catch(showError));
@@ -2793,7 +2872,7 @@ function printProfessionalInvoice(html, title, paperSize = 'A4') {
     function printDocument(html, title) {
         const popup = window.open('', '_blank', 'width=900,height=700');
         if (!popup) return toast('Allow popups to print this document.', 'error');
-        popup.document.write(`<!doctype html><html><head><title>${esc(title)}</title><link rel="stylesheet" href="${location.origin}${location.pathname.replace(/[^/]+$/, '')}style.css"></head><body style="padding:30px;background:#fff">${html}</body></html>`);
+        popup.document.write(`<!doctype html><html><head><title>${esc(title)}</title><link rel="stylesheet" href="${location.origin}${location.pathname.replace(/[^/]+$/, '')}style.css"><link rel="stylesheet" href="${location.origin}${location.pathname.replace(/[^/]+$/, '')}ui-complete.css?v=1.0.0"></head><body style="padding:30px;background:#fff">${html}</body></html>`);
         popup.document.close();
         popup.onload = () => { popup.focus(); popup.print(); };
     }
@@ -3450,19 +3529,116 @@ function printProfessionalInvoice(html, title, paperSize = 'A4') {
     }
 
     async function renderSettings() {
-        loading(); if (!state.bootstrap) await refreshBootstrap(); const item = state.settings;
-        content().innerHTML = `<div class="page-enter">${pageHeader('Business Setting', 'Customize business identity, VAT, invoices and POS behavior.', 'Settings', `<span class="badge ${item.marketplace_status==='approved'?'':'gold'}">${esc(item.marketplace_status||'Active Package')}</span>`)}<div class="settings-grid"><aside class="panel settings-nav"><button class="active">Business Profile</button><button>Invoice Setup</button><button>POS Settings</button><button>Backup</button></aside><section class="panel form-panel"><h2 class="section-title">Business Profile</h2><form id="settings-form"><div class="form-grid"><div class="form-field full"><label>Software Name</label><input name="business_name" readonly value="${esc(item.business_name)}"></div><div class="form-field"><label>Contact Number</label><input name="phone" value="${esc(item.phone || '')}"></div><div class="form-field"><label>Address</label><input name="address" value="${esc(item.address || '')}"></div><div class="form-field"><label>Currency</label><input name="currency" value="${esc(item.currency || 'BDT')}"></div><div class="form-field"><label>VAT Percentage</label><input name="vat_percentage" type="number" min="0" step=".01" value="${esc(item.vat_percentage||0)}"></div><div class="form-field"><label>TIN Number</label><input name="tin_number" value="${esc(item.tin_number||'')}"></div><div class="form-field"><label>Tag Line</label><input name="tagline" value="${esc(item.tagline||'')}"></div><div class="form-field"><label>Email</label><input name="email" type="email" value="${esc(item.email || '')}"></div><div class="form-field"><label>Website</label><input name="website" value="${esc(item.website||'')}"></div><div class="form-field full"><label>Invoice Footer</label><input name="invoice_footer" value="${esc(item.invoice_footer||'')}"></div><div class="form-field full"><label>Upload Your Logo</label><div class="upload-placeholder">Click to upload or drag & drop<br><small>PNG, JPG, JPEG, BMP (max 3MB)</small></div></div></div><h2 class="section-title" style="margin-top:28px">Invoice & POS Setup</h2><div class="form-grid three"><div class="form-field"><label>Sale Invoice Prefix</label><input name="invoice_prefix" value="${esc(item.invoice_prefix || 'INV')}"></div><div class="form-field"><label>Purchase Prefix</label><input name="purchase_prefix" value="${esc(item.purchase_prefix || 'PUR')}"></div><div class="form-field"><label>Low Stock Alert</label><input name="low_stock_alert" type="number" min="0" value="${esc(item.low_stock_alert || 5)}"></div><div class="form-field"><label>POS Printer Size</label><select name="printer_size"><option ${item.printer_size==='80mm'?'selected':''}>80mm</option><option ${item.printer_size==='58mm'?'selected':''}>58mm</option><option ${item.printer_size==='A4'?'selected':''}>A4</option></select></div><div class="form-field"><label>Default Invoice No</label><select name="default_invoice"><option>Invoice 1</option><option>Invoice 2</option><option>Invoice 3</option></select></div><div class="form-field full"><label>Invoice Note</label><input name="invoice_note" value="${esc(item.invoice_note || '')}"></div><div class="form-field full"><div class="toggle-row"><label><input name="sms_invoice" type="checkbox" ${Number(item.sms_invoice)?'checked':''}> SMS Invoice</label><label><input name="product_code" type="checkbox" ${Number(item.product_code)?'checked':''}> Product Code</label><label><input name="vat_on_product" type="checkbox" ${Number(item.vat_on_product)?'checked':''}> VAT On Product</label></div></div></div><div class="form-actions"><button type="button" id="backup-download" class="button button-secondary">Backup Download</button><button class="button button-primary">Update Settings</button></div></form></section></div></div>`;
-        const logoUpload = $('.upload-placeholder');
+        loading();
+        if (!state.bootstrap) await refreshBootstrap();
+        const item = state.settings;
+        if (item.tagline === 'Developed by Swapon Mahmud' || item.tagline === 'Cloud Core POS' || item.tagline === 'Cloudcore Soft' || item.tagline === 'Modern retail operations by Vib Tools' || !item.tagline) item.tagline = 'Retail operations, simplified by Vib Tools.';
+        if (/^(https?:\/\/)?cloudcoresoft\.com\/?$/i.test(item.website || '') || item.website === 'https://github.com/vibtools' || !item.website) item.website = 'https://vib.tools/';
+
+        const nav = [
+            ['profile', 'Business Profile'],
+            ['invoice', 'Invoice Setup'],
+            ['pos', 'POS Settings'],
+            ['backup', 'Backup'],
+        ];
+
+        content().innerHTML = `<div class="page-enter">${pageHeader('Business Setting', '', 'Settings', `<span class="badge ${item.marketplace_status==='approved'?'':'gold'}">${esc(item.marketplace_status||'Active Package')}</span>`)}
+            <div class="settings-grid">
+                <aside class="panel settings-nav" aria-label="Business settings sections">${nav.map(([key,label], index) => `<button type="button" data-settings-tab="${key}" class="${index===0?'active':''}" aria-selected="${index===0?'true':'false'}">${label}</button>`).join('')}</aside>
+                <section class="panel form-panel settings-workspace">
+                    <form id="settings-form">
+                        <section class="settings-section" data-settings-section="profile">
+                            <h2 class="section-title">Business Profile</h2>
+                            <div class="form-grid">
+                                <div class="form-field full"><label>Software Name</label><input name="business_name" readonly value="${esc(item.business_name)}"></div>
+                                <div class="form-field"><label>Contact Number</label><input name="phone" value="${esc(item.phone || '')}"></div>
+                                <div class="form-field"><label>Address</label><input name="address" value="${esc(item.address || '')}"></div>
+                                <div class="form-field"><label>Currency</label><input name="currency" value="${esc(item.currency || 'BDT')}"></div>
+                                <div class="form-field"><label>VAT Percentage</label><input name="vat_percentage" type="number" min="0" step=".01" value="${esc(item.vat_percentage||0)}"></div>
+                                <div class="form-field"><label>TIN Number</label><input name="tin_number" value="${esc(item.tin_number||'')}"></div>
+                                <div class="form-field"><label>Tag Line</label><input name="tagline" value="${esc(item.tagline||'')}"></div>
+                                <div class="form-field"><label>Email</label><input name="email" type="email" value="${esc(item.email || '')}"></div>
+                                <div class="form-field"><label>Website</label><input name="website" value="${esc(item.website||'')}"></div>
+                                <div class="form-field full"><label>Upload Your Logo</label><div class="upload-placeholder settings-logo-upload"></div></div>
+                            </div>
+                        </section>
+
+                        <section class="settings-section" data-settings-section="invoice" hidden>
+                            <h2 class="section-title">Invoice Setup</h2>
+                            <div class="form-grid three">
+                                <div class="form-field"><label>Sale Invoice Prefix</label><input name="invoice_prefix" value="${esc(item.invoice_prefix || 'INV')}"></div>
+                                <div class="form-field"><label>Purchase Prefix</label><input name="purchase_prefix" value="${esc(item.purchase_prefix || 'PUR')}"></div>
+                                <div class="form-field"><label>Default Invoice</label><select name="default_invoice"><option ${item.default_invoice==='Invoice 1'?'selected':''}>Invoice 1</option><option ${item.default_invoice==='Invoice 2'?'selected':''}>Invoice 2</option><option ${item.default_invoice==='Invoice 3'?'selected':''}>Invoice 3</option></select></div>
+                                <div class="form-field full"><label>Invoice Note</label><input name="invoice_note" value="${esc(item.invoice_note || '')}"></div>
+                                <div class="form-field full"><label>Invoice Footer</label><input name="invoice_footer" value="${esc(item.invoice_footer||'')}"></div>
+                            </div>
+                        </section>
+
+                        <section class="settings-section" data-settings-section="pos" hidden>
+                            <h2 class="section-title">POS Settings</h2>
+                            <div class="form-grid three">
+                                <div class="form-field"><label>Low Stock Alert</label><input name="low_stock_alert" type="number" min="0" value="${esc(item.low_stock_alert || 5)}"></div>
+                                <div class="form-field"><label>POS Printer Size</label><select name="printer_size"><option ${item.printer_size==='80mm'?'selected':''}>80mm</option><option ${item.printer_size==='58mm'?'selected':''}>58mm</option><option ${item.printer_size==='A4'?'selected':''}>A4</option></select></div>
+                                <div class="form-field full"><div class="toggle-row settings-toggle-grid"><label><input name="sms_invoice" type="checkbox" ${Number(item.sms_invoice)?'checked':''}> SMS Invoice</label><label><input name="product_code" type="checkbox" ${Number(item.product_code)?'checked':''}> Product Code</label><label><input name="vat_on_product" type="checkbox" ${Number(item.vat_on_product)?'checked':''}> VAT On Product</label></div></div>
+                            </div>
+                        </section>
+
+                        <section class="settings-section" data-settings-section="backup" hidden>
+                            <h2 class="section-title">Backup</h2>
+                            <div class="settings-backup-card"><div><strong>Download Browser Backup</strong><p>Export the supported business data snapshot for safekeeping. Server-side backup/restore tooling remains available through the secured maintenance workflow.</p></div><button type="button" id="backup-download" class="button button-secondary">Download Backup</button></div>
+                        </section>
+
+                        <div class="form-actions settings-save-actions"><button class="button button-primary">Update Settings</button></div>
+                    </form>
+                </section>
+            </div>
+        </div>`;
+
+        const activateSettingsTab = (key) => {
+            $$('[data-settings-tab]', content()).forEach((button) => {
+                const active = button.dataset.settingsTab === key;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            $$('[data-settings-section]', content()).forEach((section) => { section.hidden = section.dataset.settingsSection !== key; });
+            $('.settings-save-actions', content()).hidden = key === 'backup';
+        };
+        $$('[data-settings-tab]', content()).forEach((button) => button.addEventListener('click', () => activateSettingsTab(button.dataset.settingsTab)));
+
+        const logoUpload = $('.settings-logo-upload', content());
         logoUpload.classList.add('image-upload');
         logoUpload.innerHTML = `${item.logo_data ? `<img src="${esc(item.logo_data)}" alt="Business logo">` : '<span>Choose business logo</span>'}<small>PNG, JPG, WEBP or BMP, maximum 3 MB</small><input id="settings-logo" type="file" accept="image/png,image/jpeg,image/webp,image/bmp">`;
         $('#settings-logo').addEventListener('change', async () => { try { const logo = await fileToDataUrl($('#settings-logo')); if (logo) logoUpload.querySelector('img,span')?.replaceWith(Object.assign(document.createElement('img'), { src: logo, alt: 'Business logo preview' })); } catch (error) { toast(apiErrorMessage(error), 'error'); $('#settings-logo').value = ''; } });
-        $('#settings-form').addEventListener('submit', async (event) => { event.preventDefault(); try { const body = serializeForm(event.currentTarget); body.logo_data = await fileToDataUrl($('#settings-logo')); const response = await api('settings_save', { body }); toast(response.message); await refreshBootstrap(); document.title = `${state.settings.business_name} | POS ERP`; } catch (error) { toast(apiErrorMessage(error), 'error'); } });
-        $('#backup-download').addEventListener('click',async()=>{try{const backup=await api('backup',{body:{}});const blob=new Blob([JSON.stringify(backup.data,null,2)],{type:'application/json'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`pos-backup-${today()}.json`;link.click();URL.revokeObjectURL(link.href);toast('Backup downloaded.');}catch(error){toast(error.message,'error');}});
+        $('#settings-form').addEventListener('submit', async (event) => { event.preventDefault(); try { const body = serializeForm(event.currentTarget); body.logo_data = await fileToDataUrl($('#settings-logo')); const response = await api('settings_save', { body }); toast(response.message); await refreshBootstrap(); document.title = `${state.settings.business_name} | VibRetail`; } catch (error) { toast(apiErrorMessage(error), 'error'); } });
+        $('#backup-download').addEventListener('click',async()=>{try{const backup=await api('backup',{body:{}});const blob=new Blob([JSON.stringify(backup.data,null,2)],{type:'application/json'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`vibretail-backup-${today()}.json`;link.click();URL.revokeObjectURL(link.href);toast('Backup downloaded.');}catch(error){toast(apiErrorMessage(error),'error');}});
+    }
+
+    async function renderAbout() {
+        const whatsappIcon = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.4 7.7c.4-.4.8-.3 1 .1l1 2c.2.4.1.7-.2 1l-.7.7c.8 1.7 2.1 3 3.8 3.8l.7-.7c.3-.3.6-.4 1-.2l2 1c.4.2.5.6.1 1-1 1.1-2.3 1.4-3.9.8-3.1-1.1-5.3-3.3-6.4-6.4-.6-1.6-.3-2.9.8-3.9z"></path></svg>`;
+        const companyWebsite = config.companyWebsite || 'https://vib.tools/';
+        const companyContact = config.companyContact || 'https://vib.tools/contact';
+        const companyLogo = config.companyLogo || 'https://vibtools.github.io/vibtools-brand-assets/logos/icon-512.png';
+        const companyGithub = config.companyGithub || 'https://github.com/vibtools';
+        const companyFacebook = config.companyFacebook || 'https://www.facebook.com/vib.tools';
+        const companyX = config.companyX || 'https://x.com/vibtools';
+        const companyInstagram = config.companyInstagram || 'https://www.instagram.com/vib.tools';
+        const companyReddit = config.companyReddit || 'https://www.reddit.com/user/VibTools/';
+        const companyEmail = config.companyEmail || 'hello@vib.tools';
+        const supportEmail = config.companySupportEmail || 'support@vib.tools';
+        const whatsappNumber = config.companyWhatsappNumber || '+880 1795-470603';
+        const whatsappUrl = config.companyWhatsappUrl || 'https://wa.me/8801795470603';
+
+        content().innerHTML = `<div class="page-enter about-page">${pageHeader('About VibRetail', '', 'About')}
+            <section class="about-hero panel"><div class="about-brand-logo"><img src="${esc(companyLogo)}" alt="Vib Tools logo"></div><div><span class="eyebrow">VIB TOOLS</span><h2>Retail operations, simplified.</h2><p>VibRetail is a compact retail operations suite that brings sales, purchasing, inventory, customers, suppliers, service workflows, finance, HRM and reporting into one focused workspace for day-to-day retail operations.</p><div class="about-actions"><a class="button button-primary" href="${esc(companyWebsite)}" target="_blank" rel="noopener">Visit Vib Tools</a><a class="button button-secondary" href="${esc(companyContact)}" target="_blank" rel="noopener">Contact</a><a class="button button-secondary" href="${esc(companyGithub)}" target="_blank" rel="noopener">GitHub</a></div></div></section>
+            <div class="about-grid"><article class="panel panel-pad"><span class="about-icon">OP</span><h3>Operational by design</h3><p>Fast, information-dense workflows for daily retail operations without unnecessary visual noise.</p></article><article class="panel panel-pad"><span class="about-icon">ST</span><h3>Stock-aware</h3><p>Products, serials, purchases, sales, returns, transfers, damage and low-stock visibility stay connected.</p></article><article class="panel panel-pad"><span class="about-icon">FN</span><h3>Finance connected</h3><p>Payments, bank accounts, expenses, receivables, payables, EMI and reporting work from the same operational data.</p></article><article class="panel panel-pad"><span class="about-icon">SV</span><h3>Service ready</h3><p>Warranty, RMA and repair/service workflows stay inside the same retail operations environment.</p></article></div>
+            <section class="panel panel-pad about-company"><div><span class="eyebrow">ABOUT VIB TOOLS</span><h2>Open tools for focused teams.</h2><p>Vib Tools builds practical software products and is an open-source developer ecosystem focused on simplifying operational complexity. Its products span deployment automation, identity, developer infrastructure and software tooling; VibRetail applies the same emphasis on ownership, predictable workflows and maintainable software to retail operations.</p></div><div class="about-meta"><div><span>Product</span><strong>VibRetail</strong></div><div><span>Developer</span><strong>Vib Tools</strong></div><div><span>Category</span><strong>Retail Operations</strong></div><div><span>License</span><strong>See repository LICENSE</strong></div></div></section>
+            <section class="panel panel-pad about-contact"><div class="about-contact-copy"><span class="eyebrow">CONTACT & COMMUNITY</span><h2>Connect with Vib Tools.</h2><p>Product questions, ecosystem support, collaboration and community links are available through the official Vib Tools channels.</p></div><div class="about-contact-grid"><a href="${esc(companyContact)}" target="_blank" rel="noopener"><span>Contact</span><strong>vib.tools/contact</strong></a><a href="${esc(whatsappUrl)}" target="_blank" rel="noopener" class="about-whatsapp">${whatsappIcon}<span><small>WhatsApp</small><strong>${esc(whatsappNumber)}</strong></span></a><a href="mailto:${esc(companyEmail)}"><span>Email</span><strong>${esc(companyEmail)}</strong></a><a href="mailto:${esc(supportEmail)}"><span>Support</span><strong>${esc(supportEmail)}</strong></a></div><div class="about-socials"><a href="${esc(companyGithub)}" target="_blank" rel="noopener">GitHub</a><a href="${esc(companyX)}" target="_blank" rel="noopener">X</a><a href="${esc(companyFacebook)}" target="_blank" rel="noopener">Facebook</a><a href="${esc(companyInstagram)}" target="_blank" rel="noopener">Instagram</a><a href="${esc(companyReddit)}" target="_blank" rel="noopener">Reddit</a><a href="${esc(companyWebsite)}" target="_blank" rel="noopener">Website</a></div></section>
+        </div>`;
     }
 
     async function renderAdmin() {
         loading(); if (!state.bootstrap) await refreshBootstrap(); const result = await api('admin_data');
-        content().innerHTML = `<div class="page-enter">${pageHeader('Admin', 'Manage system users and review recent activity.', 'Administration')}<div class="two-column"><section class="panel form-panel"><h2 class="section-title">Create User</h2><form id="user-form"><div class="form-grid"><div class="form-field"><label>Name</label><input name="name" required></div><div class="form-field"><label>Phone</label><input name="phone" required></div><div class="form-field"><label>Role</label><select name="role">${optionRows(state.bootstrap.roles,'name','','Select Role')}</select></div><div class="form-field"><label>Temporary Password</label><input name="password" type="password" minlength="12" maxlength="128" required><small>12+ characters with uppercase, lowercase, number and symbol. User must change it after sign-in.</small></div></div><div class="form-actions"><button class="button button-primary">Create User</button></div></form><h2 class="section-title" style="margin-top:26px">System Users</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Status</th></tr></thead><tbody>${result.users.map((row) => `<tr><td><strong>${esc(row.name)}</strong></td><td>${esc(row.phone)}</td><td>${esc(row.role)}</td><td>${badge(Number(row.status) ? 'Active' : 'Inactive')}</td></tr>`).join('')}</tbody></table></div></section><aside class="panel panel-pad"><div class="panel-title"><span>LG</span><div><h3>Recent Activity</h3><p>Last 30 system events</p></div></div><div class="activity-list">${result.activity.length ? result.activity.map((row) => `<div class="activity-item"><span>EV</span><p><strong>${esc(row.action)}</strong><br><small>${esc(row.details || row.user_name || '')}</small></p><small>${formatDate(String(row.created_at).slice(0, 10))}</small></div>`).join('') : '<p class="muted">No activity yet.</p>'}</div></aside></div></div>`;
+        content().innerHTML = `<div class="page-enter">${pageHeader('Admin', 'Manage system users and review recent activity.', 'Administration')}<div class="two-column"><section class="panel form-panel"><h2 class="section-title">Create User</h2><form id="user-form"><div class="form-grid"><div class="form-field"><label>Name</label><input name="name" required></div><div class="form-field"><label>Phone</label><input name="phone" required></div><div class="form-field"><label>Role</label><select name="role">${optionRows(state.bootstrap.roles,'name','','Select Role')}</select></div><div class="form-field"><label>Temporary Password</label><input name="password" type="password" minlength="12" maxlength="128" required><small>12+ characters with uppercase, lowercase, number and symbol. User must change it after sign-in.</small></div></div><div class="form-actions"><button class="button button-primary">Create User</button></div></form><h2 class="section-title" style="margin-top:26px">System Users</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Status</th></tr></thead><tbody>${result.users.map((row) => `<tr><td><strong>${esc(row.name)}</strong></td><td>${esc(row.phone)}</td><td>${esc(row.role)}</td><td>${badge(Number(row.status) ? 'Active' : 'Inactive')}</td></tr>`).join('')}</tbody></table></div></section><aside class="panel panel-pad"><div class="panel-title"><span>LG</span><div><h3>Recent Activity</h3></div></div><div class="activity-list">${result.activity.length ? result.activity.map((row) => `<div class="activity-item"><span>EV</span><p><strong>${esc(row.action)}</strong><br><small>${esc(row.details || row.user_name || '')}</small></p><small>${formatDate(String(row.created_at).slice(0, 10))}</small></div>`).join('') : '<p class="muted">No activity yet.</p>'}</div></aside></div></div>`;
         $('#user-form').addEventListener('submit', async (event) => { event.preventDefault(); try { const response = await api('user_save', { body: serializeForm(event.currentTarget) }); toast(response.message); await renderAdmin(); } catch (error) { toast(apiErrorMessage(error), 'error'); } });
     }
 
@@ -3478,7 +3654,7 @@ function printProfessionalInvoice(html, title, paperSize = 'A4') {
         barcode: () => renderBarcode(false), 'barcode-single': () => renderBarcode(true), bank: renderBank, transfer: renderTransfer, cheque: () => renderCheque(false), 'cheque-new': () => renderCheque(true), transactions: renderTransactions,
         investor: renderInvestor, 'emi-new': () => renderEmi(true), 'emi-list': () => renderEmi(false), 'installment-report': () => renderInstallmentReport('due'),
         team: () => renderTeam(false), 'sr-list': () => renderTeam(true), attendance: renderAttendance, role: renderRole,
-        admin: renderAdmin, settings: renderSettings, profile:renderProfile, marketplace:renderMarketplace, 'payment-center':renderPaymentCenter, 'buy-sms':renderBuySms
+        admin: renderAdmin, settings: renderSettings, about: renderAbout, profile:renderProfile, marketplace:renderMarketplace, 'payment-center':renderPaymentCenter, 'buy-sms':renderBuySms
     };
 
     Object.keys(reportMap).forEach((page) => { routes[page] = () => renderReport(page); });
@@ -3499,7 +3675,7 @@ function printProfessionalInvoice(html, title, paperSize = 'A4') {
         const activeChild = $(`.nav-children a[data-page="${page}"]`);
         if (activeChild) activeChild.closest('.nav-group')?.classList.add('open');
         closeMobileSidebar();
-        try { await routes[page](); const heading = $('h1', content()); if (heading) document.title = `${heading.textContent} | ${state.settings.business_name}`; content().focus({ preventScroll: true }); } catch (error) { showError(error); }
+        try { await routes[page](); finalizePageUi(content()); const heading = $('h1', content()); if (heading) document.title = `${heading.textContent} | ${state.settings.business_name}`; content().focus({ preventScroll: true }); } catch (error) { showError(error); }
     }
 
     function closeMobileSidebar() {
@@ -3521,6 +3697,9 @@ function printProfessionalInvoice(html, title, paperSize = 'A4') {
         $('#profile-button')?.addEventListener('click', (event) => { event.stopPropagation(); $('#profile-menu').classList.toggle('open'); $('#quick-menu').classList.remove('open'); });
         document.addEventListener('click', () => { $('#quick-menu')?.classList.remove('open'); $('#profile-menu')?.classList.remove('open'); });
         $('#logout-button')?.addEventListener('click', async () => { try { await api('logout', { body: {} }); location.href = 'index.php'; } catch (error) { toast(apiErrorMessage(error), 'error'); } });
+        const uiObserver = new MutationObserver(scheduleFinalizePageUi);
+        if (content()) uiObserver.observe(content(), { childList: true, subtree: true });
+        if ($('#modal-root')) uiObserver.observe($('#modal-root'), { childList: true, subtree: true });
         const legacyHashPage = location.hash.slice(1);
         const initialPage = routes[legacyHashPage] ? legacyHashPage : (config.initialPage || 'dashboard');
         refreshBootstrap().then(() => navigate(initialPage, false)).catch(showError);

@@ -89,8 +89,8 @@ $check('InnoDB storage', static function () use ($pdo): bool {
     return (int) $stmt->fetchColumn() === 0;
 });
 $check('Business settings', static fn(): bool => (int) $pdo->query('SELECT COUNT(*) FROM settings WHERE id=1')->fetchColumn() === 1);
-$check('Cloud Core branding', static fn(): bool => (string) $pdo->query('SELECT business_name FROM settings WHERE id=1')->fetchColumn() === SOFTWARE_NAME);
-$check('Developer license files', static fn(): bool => is_file(dirname(__DIR__, 2) . '/src/LICENSE.md') && is_file(dirname(__DIR__, 2) . '/src/license.php') && DEVELOPER_NAME === 'Swapon Mahmud');
+$check('VibRetail branding', static fn(): bool => in_array((string) $pdo->query('SELECT business_name FROM settings WHERE id=1')->fetchColumn(), [SOFTWARE_NAME, 'Cloud Core POS'], true));
+$check('License files and About route', static fn(): bool => is_file(dirname(__DIR__, 2) . '/LICENSE') && is_file(dirname(__DIR__, 2) . '/src/LICENSE.md') && is_file(dirname(__DIR__, 2) . '/src/about.php') && !is_file(dirname(__DIR__, 2) . '/src/license.php') && DEVELOPER_NAME === 'Vib Tools');
 $check('Active administrator', static fn(): bool => (int) $pdo->query("SELECT COUNT(*) FROM users WHERE status=1 AND LOWER(role) IN ('admin','administrator')")->fetchColumn() > 0);
 $check('Administrator role permissions', static fn(): bool => (int) $pdo->query("SELECT COUNT(*) FROM roles WHERE LOWER(name)='administrator' AND permissions='all'")->fetchColumn() === 1);
 $check('Password hashes', static function () use ($pdo): bool {

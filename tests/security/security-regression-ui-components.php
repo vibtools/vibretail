@@ -101,21 +101,21 @@ check_ui03a(
 );
 
 foreach ([
-    '--green: #00b96b;',
-    '--green-dark: #008f55;',
-    '--green-soft: #ddf9ec;',
-    '--blue: #1769ef;',
-    '--purple: #8d23e8;',
-    '--orange: #ec8700;',
-    '--red: #f20d4f;',
-    '--teal: #00a997;',
-    '--ink: #15211d;',
-    '--muted: #6b7973;',
-    '--line: #e7eeeb;',
-    '--surface: #ffffff;',
-    '--canvas: #f5f8f7;',
+    '--green: #2563EB;',
+    '--green-dark: #1D4ED8;',
+    '--green-soft: #EFF6FF;',
+    '--blue: #3B82F6;',
+    '--purple: #8B5CF6;',
+    '--orange: #F59E0B;',
+    '--red: #EF4444;',
+    '--teal: #10B981;',
+    '--ink: #1F2937;',
+    '--muted: #6B7280;',
+    '--line: #E5E7EB;',
+    '--surface: #FFFFFF;',
+    '--canvas: #F3F4F6;',
 ] as $token) {
-    check_ui03a(has_ui03a($style, $token), 'Frozen VibRetail palette retained: ' . strtok($token, ':'));
+    check_ui03a(has_ui03a($style, $token), 'Approved VibRetail palette retained: ' . strtok($token, ':'));
 }
 
 $stylePos = strpos($shell, 'style.css?v=1.2.1');

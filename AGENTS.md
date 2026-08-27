@@ -21,4 +21,4 @@ Git initialization, commits, repository creation and push operations remain manu
 
 ## Branding/license constraint
 
-The working repository name is VibRetail. The current bundled software license protects the legacy Cloud Core POS software name and developer credentials. Do not perform the public/runtime branding replacement until the license/rights transition is explicitly authorized.
+The official product identity is VibRetail by Vib Tools. Runtime and repository branding may use this authorized identity. Preserve the existing license terms unless a separate relicensing scope is explicitly approved.

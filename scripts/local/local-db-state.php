@@ -30,7 +30,7 @@ try {
     } catch (Throwable) {}
 
     $result = [
-        'project' => 'Cloud Core POS',
+        'project' => 'VibRetail',
         'candidate' => 'CCPOS-EZ-2026.08.27-001',
         'db_host' => DB_HOST,
         'db_name' => DB_NAME,
@@ -45,7 +45,7 @@ try {
     if (array_key_exists('json', $options)) {
         echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
     } else {
-        echo "Cloud Core POS - Local DB State\n";
+        echo "VibRetail - Local DB State\n";
         echo 'DB: ' . DB_NAME . '@' . DB_HOST . ' server=' . $version . PHP_EOL;
         echo 'Tables: ' . $tables . PHP_EOL;
         foreach ($counts as $table => $count) echo $table . '=' . ($count === null ? 'MISSING' : $count) . PHP_EOL;

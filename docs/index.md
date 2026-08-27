@@ -1,7 +1,5 @@
-# VibRetail Documentation
+# VibRetail
 
-VibRetail is the locked target name for the repository modernization project. The current runtime application remains under its existing Cloud Core POS license/attribution until the branding/license transition is explicitly resolved.
+VibRetail is the official product identity for this retail operations repository, maintained by Vib Tools.
 
-- [Installation](getting-started/installation.md)
-- [Backup & Restore](guides/backup-restore.md)
-- [Shared Hosting](guides/shared-hosting.md)
+The project keeps the existing non-commercial attribution license model while using the authorized VibRetail / Vib Tools branding.

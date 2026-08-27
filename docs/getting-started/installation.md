@@ -1,4 +1,4 @@
-# Cloud Core POS - Easy Web Installer & Upgrade Runbook
+# VibRetail - Easy Web Installer & Upgrade Runbook
 
 ## Product goal
 
@@ -9,7 +9,7 @@ A normal new customer should only need to:
 3. Visit `/install`.
 4. Enter database, Administrator and optional business details.
 5. Optionally enable demo data.
-6. Click **Install Cloud Core POS**.
+6. Click **Install VibRetail**.
 7. Go to Login.
 
 No command line, manual `schema.sql` import, `.env` editing, encryption-key generation or temporary Administrator password is required for a fresh installation.

@@ -63,7 +63,7 @@
     "runtimeBrandTransition": "pending-license-authorization"
   },
   "license": {
-    "name": "Cloud Core POS Free Non-Commercial Attribution License 1.0",
+    "name": "VibRetail Free Non-Commercial Attribution License 1.0",
     "spdx": "LicenseRef-Cloud-Core-POS-NC-Attribution-1.0",
     "file": "LICENSE"
   },

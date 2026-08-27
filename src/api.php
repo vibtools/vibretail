@@ -118,7 +118,7 @@ try {
     $pdo = db();
     $pendingMigrations = migration_pending_ids($pdo, DB_NAME);
     if ($pendingMigrations !== []) {
-        respond(['ok' => false, 'message' => 'A database upgrade is required before Cloud Core POS can continue.', 'upgrade_url' => 'install'], 503, 'UPGRADE_REQUIRED');
+        respond(['ok' => false, 'message' => 'A database upgrade is required before VibRetail can continue.', 'upgrade_url' => 'install'], 503, 'UPGRADE_REQUIRED');
     }
 
     if ($action === 'login') {
@@ -176,7 +176,7 @@ try {
     }
 
     if ($action === 'bootstrap') {
-        $settings = $pdo->query('SELECT * FROM settings WHERE id = 1')->fetch();
+        $settings = normalize_brand_settings($pdo->query('SELECT * FROM settings WHERE id = 1')->fetch() ?: []);
         $can = static fn(string $permission): bool => user_has_permission($userPermissions, $permission);
         $needsCustomers = $can('customer') || $can('sale') || $can('service') || $can('quotation') || $can('emi') || $can('report');
         $needsSuppliers = $can('supplier') || $can('purchase') || $can('report');
@@ -1197,9 +1197,9 @@ if ($action === 'contacts') {
         throw new InvalidArgumentException('Invoice not found.');
     }
 
-    $settings = $pdo
+    $settings = normalize_brand_settings($pdo
         ->query('SELECT * FROM settings WHERE id = 1')
-        ->fetch();
+        ->fetch() ?: []);
 
     respond([
         'ok' => true,
