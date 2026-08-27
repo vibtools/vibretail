@@ -237,10 +237,13 @@ foreach ($runtimeUiPaths as $path) {
 }
 shell_report($runtimeOk, 'Runtime security probe covers shared ui source');
 
-$staticRunner = shell_read($repoRoot . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'run-static.cmd');
+$staticCmdRunner = shell_read($repoRoot . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'run-static.cmd');
+$staticPhpRunner = shell_read($repoRoot . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'run-static.php');
+$staticRunnerOk = str_contains($staticCmdRunner, 'scripts\\test\\run-static.php')
+    && str_contains($staticPhpRunner, 'tests/security/security-regression-ui-shell.php');
 shell_report(
-    str_contains($staticRunner, 'tests\\security\\security-regression-ui-shell.php'),
-    'Static runner executes UI-02A shell regression'
+    $staticRunnerOk,
+    'Static runner executes UI-02A shell regression through cross-platform delegate'
 );
 
 $appJs = shell_read($repoRoot . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'app.js');

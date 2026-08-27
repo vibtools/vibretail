@@ -1,0 +1,28 @@
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+      - documentation-only
+  categories:
+    - title: 🚀 Features
+      labels:
+        - enhancement
+        - feature
+    - title: 🛡️ Security & Reliability
+      labels:
+        - security
+        - hardening
+        - reliability
+    - title: 🎨 UI & UX
+      labels:
+        - ui
+        - ux
+        - design
+    - title: 🧰 Maintenance
+      labels:
+        - maintenance
+        - refactor
+        - chore
+    - title: 📝 Other Changes
+      labels:
+        - '*'

@@ -1,0 +1,248 @@
+name: Build & Publish cPanel Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Static quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Release tag must look like v0.1.0, v0.1.0-dev.7, v1.0.0-rc.1, etc."
+            exit 1
+          fi
+
+      - name: Set up PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mbstring, openssl, json, gd, exif, zip
+          coverage: none
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run cross-platform static gate
+        run: php scripts/test/run-static.php
+
+      - name: Ensure tests did not mutate tracked source
+        run: git diff --exit-code
+
+  uat:
+    name: MariaDB integration UAT
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:10.4
+        env:
+          MARIADB_ROOT_PASSWORD: ci-root-unused
+          MARIADB_DATABASE: vibretail_ci
+          MARIADB_USER: vibretail_ci
+          MARIADB_PASSWORD: ci-db-only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uvibretail_ci -pci-db-only"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+
+    env:
+      POS_APP_ENV: local
+      POS_TIMEZONE: Asia/Dhaka
+      POS_DB_HOST: 127.0.0.1
+      POS_DB_PORT: 3306
+      POS_DB_NAME: vibretail_ci
+      POS_DB_USER: vibretail_ci
+      POS_DB_PASS: ci-db-only
+      POS_ALLOW_WEB_INSTALL: 'false'
+      POS_LOG_DIR: ${{ github.workspace }}/.ci-runtime/logs
+      POS_BACKUP_DIR: ${{ github.workspace }}/.ci-runtime/backups
+      VIBRETAIL_CI_CONFIRM: CI-UAT-RESET
+
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v6
+
+      - name: Set up PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mbstring, openssl, json, gd, exif, zip
+          coverage: none
+
+      - name: Create ephemeral CI credentials and runtime directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .ci-runtime/logs .ci-runtime/backups src/uploads/products
+          echo "POS_SERVICE_CREDENTIAL_KEY=base64:$(openssl rand -base64 32 | tr -d '\n')" >> "$GITHUB_ENV"
+          echo "VIBRETAIL_CI_ADMIN_PASSWORD=$(openssl rand -hex 14)Aa1!" >> "$GITHUB_ENV"
+
+      - name: Bootstrap clean CI database
+        run: php scripts/ci/bootstrap-uat.php
+
+      - name: Run database UAT
+        run: php tests/uat/uat.php
+
+  package:
+    name: Build verified cPanel package
+    needs: [quality, uat]
+    runs-on: ubuntu-latest
+    outputs:
+      asset_name: ${{ steps.meta.outputs.asset_name }}
+      checksum_name: ${{ steps.meta.outputs.checksum_name }}
+      version: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mbstring, openssl, json, gd, exif, zip
+          coverage: none
+
+      - name: Resolve release metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          ASSET="VibRetail-${VERSION}-cpanel.zip"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "asset_name=${ASSET}" >> "$GITHUB_OUTPUT"
+          echo "checksum_name=${ASSET}.sha256" >> "$GITHUB_OUTPUT"
+
+      - name: Build clean release tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET="${RUNNER_TEMP}/vibretail-release"
+          php scripts/release/build-release.php --target="${TARGET}" --force
+          php scripts/release/validate-release.php "${TARGET}"
+          test -f "${TARGET}/index.php"
+          test -f "${TARGET}/install.php"
+          test -f "${TARGET}/schema.sql"
+          test -f "${TARGET}/LICENSE-REPOSITORY.txt"
+          test -f "${TARGET}/INSTALLATION.md"
+          test ! -e "${TARGET}/src"
+          test ! -e "${TARGET}/tests"
+          test ! -e "${TARGET}/scripts"
+          test ! -e "${TARGET}/project"
+          test ! -e "${TARGET}/.github"
+          if find "${TARGET}/uploads/products" -type f ! -name '.gitkeep' -print -quit 2>/dev/null | grep -q .; then
+            echo "::error::A real product upload entered the release tree."
+            exit 1
+          fi
+          mkdir -p dist
+          php scripts/release/package-release.php \
+            --source="${TARGET}" \
+            --output="dist/${{ steps.meta.outputs.asset_name }}" \
+            --tag="${GITHUB_REF_NAME}" \
+            --commit="${GITHUB_SHA}"
+
+      - name: Verify packaged ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP="dist/${{ steps.meta.outputs.asset_name }}"
+          SHA="dist/${{ steps.meta.outputs.checksum_name }}"
+          test -s "${ZIP}"
+          test -s "${SHA}"
+          unzip -t "${ZIP}"
+          unzip -Z1 "${ZIP}" | grep -Fxq 'index.php'
+          unzip -Z1 "${ZIP}" | grep -Fxq 'install.php'
+          unzip -Z1 "${ZIP}" | grep -Fxq 'RELEASE-MANIFEST.txt'
+          if unzip -Z1 "${ZIP}" | grep -E '^(src|tests|scripts|project|\.github|\.git)/' >/dev/null; then
+            echo "::error::Repository-only directory found inside deployable ZIP."
+            exit 1
+          fi
+          sha256sum -c "${SHA}"
+
+      - name: Upload verified release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanel-release-${{ github.ref_name }}
+          path: |
+            dist/${{ steps.meta.outputs.asset_name }}
+            dist/${{ steps.meta.outputs.checksum_name }}
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: Publish GitHub Release
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download verified package
+        uses: actions/download-artifact@v5
+        with:
+          name: cpanel-release-${{ github.ref_name }}
+          path: dist
+
+      - name: Publish release with deployable assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${{ needs.package.outputs.version }}"
+          ASSET="dist/${{ needs.package.outputs.asset_name }}"
+          SHA="dist/${{ needs.package.outputs.checksum_name }}"
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "::error::A GitHub Release already exists for ${TAG}; refusing to replace published assets."
+            exit 1
+          fi
+
+          TITLE="VibRetail ${VERSION}"
+          EXTRA=()
+          if [[ "${VERSION}" == *-* ]]; then
+            TITLE="${TITLE} — cPanel Validation Candidate"
+            EXTRA+=(--prerelease)
+          fi
+
+          gh release create "${TAG}" \
+            "${ASSET}" \
+            "${SHA}" \
+            --verify-tag \
+            --title "${TITLE}" \
+            --generate-notes \
+            "${EXTRA[@]}"
+
+          gh release view "${TAG}" --json url,tagName,name,isPrerelease

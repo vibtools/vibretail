@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Automated Release Pipeline
+- Added tag-triggered GitHub Actions publishing for `v*` Semantic Version tags.
+- Added a cross-platform PHP static runner so the same regression suite runs on Windows and GitHub-hosted Linux runners.
+- Added an ephemeral MariaDB 10.4 integration/UAT gate restricted to local `vibretail_ci*` databases.
+- Added verified cPanel ZIP packaging with a release manifest and SHA-256 checksum.
+- Hardened release validation for arbitrary active `.env.*` files, private runtime files, real product uploads and embedded private-key patterns.
+- GitHub Releases now publish only after static, UAT, release-tree, ZIP-integrity and checksum gates pass.
+- The workflow-generated `VibRetail-<version>-cpanel.zip` is the supported deployment asset; GitHub automatic Source code archives remain repository snapshots.
+
 ### Final UI R6 Sidebar Footer Invariant
 - Removed the legacy dashboard-only `$shellShowDeveloperCredit = false` override that suppressed the Vib Tools/About footer only on Dashboard.
 - Removed the shared shell footer visibility flag entirely so authenticated pages always render the company/About footer.
