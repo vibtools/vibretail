@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Release Automation Hotfix
+- Fixed GitHub Actions SHA-256 verification so checksum basenames are resolved from the release asset directory.
+- Masked dynamically generated CI service/admin credentials before exporting them to subsequent Actions steps.
+- Updated the Node quality gate to the current `actions/setup-node@v7` / Node 24 baseline.
+- Added regression coverage for checksum path resolution and CI secret masking.
+
 ### Automated Release Pipeline
 - Added tag-triggered GitHub Actions publishing for `v*` Semantic Version tags.
 - Added a cross-platform PHP static runner so the same regression suite runs on Windows and GitHub-hosted Linux runners.

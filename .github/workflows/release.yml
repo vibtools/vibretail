@@ -39,9 +39,9 @@ jobs:
           coverage: none
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Run cross-platform static gate
         run: php scripts/test/run-static.php
@@ -97,8 +97,12 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .ci-runtime/logs .ci-runtime/backups src/uploads/products
-          echo "POS_SERVICE_CREDENTIAL_KEY=base64:$(openssl rand -base64 32 | tr -d '\n')" >> "$GITHUB_ENV"
-          echo "VIBRETAIL_CI_ADMIN_PASSWORD=$(openssl rand -hex 14)Aa1!" >> "$GITHUB_ENV"
+          SERVICE_KEY="base64:$(openssl rand -base64 32 | tr -d '\n')"
+          ADMIN_PASSWORD="$(openssl rand -hex 14)Aa1!"
+          echo "::add-mask::${SERVICE_KEY}"
+          echo "::add-mask::${ADMIN_PASSWORD}"
+          printf 'POS_SERVICE_CREDENTIAL_KEY=%s\n' "${SERVICE_KEY}" >> "$GITHUB_ENV"
+          printf 'VIBRETAIL_CI_ADMIN_PASSWORD=%s\n' "${ADMIN_PASSWORD}" >> "$GITHUB_ENV"
 
       - name: Bootstrap clean CI database
         run: php scripts/ci/bootstrap-uat.php
@@ -183,7 +187,10 @@ jobs:
             echo "::error::Repository-only directory found inside deployable ZIP."
             exit 1
           fi
-          sha256sum -c "${SHA}"
+          (
+            cd dist
+            sha256sum -c "${{ steps.meta.outputs.checksum_name }}"
+          )
 
       - name: Upload verified release assets
         uses: actions/upload-artifact@v4

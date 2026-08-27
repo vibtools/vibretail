@@ -58,9 +58,31 @@ foreach ([
     '--prerelease' => 'prerelease flag supported',
     '-cpanel.zip' => 'deployable asset is explicitly cPanel named',
     'sha256sum -c' => 'checksum is independently verified',
+    'actions/setup-node@v7' => 'current setup-node action is used',
+    "node-version: '24'" => 'Node 24 baseline avoids deprecated Node 20',
 ] as $needle => $name) {
     $check(str_contains($workflow, $needle), $name);
 }
+
+
+$serviceMaskPos = strpos($workflow, 'echo "::add-mask::${SERVICE_KEY}"');
+$serviceExportPos = strpos($workflow, "printf 'POS_SERVICE_CREDENTIAL_KEY=%s\\n'");
+$adminMaskPos = strpos($workflow, 'echo "::add-mask::${ADMIN_PASSWORD}"');
+$adminExportPos = strpos($workflow, "printf 'VIBRETAIL_CI_ADMIN_PASSWORD=%s\\n'");
+$check(
+    $serviceMaskPos !== false && $serviceExportPos !== false && $serviceMaskPos < $serviceExportPos,
+    'dynamic service credential is masked before export'
+);
+$check(
+    $adminMaskPos !== false && $adminExportPos !== false && $adminMaskPos < $adminExportPos,
+    'dynamic CI administrator password is masked before export'
+);
+$checksumDirPos = strpos($workflow, 'cd dist');
+$checksumVerifyPos = strpos($workflow, 'sha256sum -c "${{ steps.meta.outputs.checksum_name }}"');
+$check(
+    $checksumDirPos !== false && $checksumVerifyPos !== false && $checksumDirPos < $checksumVerifyPos,
+    'checksum verification resolves basename relative to dist directory'
+);
 
 $check(!str_contains($workflow, 'pull_request_target'), 'release workflow does not use pull_request_target');
 $check(!preg_match('/permissions:\s*write-all/i', $workflow), 'workflow does not grant write-all permissions');
@@ -77,6 +99,7 @@ $check(str_contains($validator, 'Possible embedded private key:'), 'release vali
 $packager = $text['packager'];
 $check(str_contains($packager, 'RELEASE-MANIFEST.txt'), 'package includes release manifest');
 $check(str_contains($packager, "hash_file('sha256'"), 'package writes SHA-256 checksum');
+$check(str_contains($packager, "basename(\$output)"), 'checksum manifest stores portable asset basename');
 $check(str_contains($packager, 'Repository-only path entered release package'), 'packager rejects repository-only directories');
 $check(str_contains($packager, 'Runtime product upload entered release package'), 'packager independently rejects real uploads');
 $check(str_contains($packager, "['index.php', 'install.php', 'schema.sql'"), 'packager requires application root files');

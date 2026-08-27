@@ -71,8 +71,8 @@ If any test, UAT, validation, package, or checksum step fails, the GitHub Releas
 After the release-automation patch itself has been accepted and pushed to `main`, create an annotated release tag at that exact HEAD:
 
 ```bat
-git tag -a v0.1.0-dev.7 HEAD -m "VibRetail 0.1.0-dev.7 cPanel validation candidate"
-git push origin v0.1.0-dev.7
+git tag -a v0.1.0-dev.8 HEAD -m "VibRetail 0.1.0-dev.8 cPanel validation candidate"
+git push origin v0.1.0-dev.8
 ```
 
 No manual release ZIP build is required.
@@ -82,8 +82,8 @@ No manual release ZIP build is required.
 The workflow uploads the same verified files as a temporary Actions artifact and then attaches them to the GitHub Release:
 
 ```text
-VibRetail-0.1.0-dev.7-cpanel.zip
-VibRetail-0.1.0-dev.7-cpanel.zip.sha256
+VibRetail-0.1.0-dev.8-cpanel.zip
+VibRetail-0.1.0-dev.8-cpanel.zip.sha256
 ```
 
 GitHub's automatic Source code archives will still be visible. Ignore them for cPanel deployment.
@@ -130,3 +130,8 @@ The release pipeline verifies that the deployable ZIP:
 - contains no real product uploads;
 - passes PHP lint and release secret-pattern checks;
 - has a SHA-256 checksum.
+
+## Failed tag policy
+
+A failed release-candidate tag is not moved or reused. Keep the failed tag as an audit record, fix `main`, and create the next version tag at the corrected commit. For example, `v0.1.0-dev.7` remains the failed first automation candidate and the corrected workflow is tested with `v0.1.0-dev.8`.
+
