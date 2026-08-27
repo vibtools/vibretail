@@ -92,7 +92,7 @@ foreach (['X-Content-Type-Options','X-Frame-Options','Referrer-Policy','Permissi
 report_probe(header_count($login['headers'], 'X-Powered-By') === 0, 'PHP technology header hidden');
 report_probe((bool) preg_match('/^[a-f0-9]{48}$/', $csrf), 'login CSRF token issued', $csrf === '' ? 'missing' : 'present');
 
-foreach (['/.env','/.env.server','/.env.windows','/error_log','/schema.sql','/migrations.php','/installer-lib.php','/backup.php','/restore.php','/install','/install.php','/storage/private/installed.lock','/tools/migrate-service-credentials.php','/tools/local-db-create.php','/probe.zip'] as $path) {
+foreach (['/.env','/.env.server','/.env.windows','/error_log','/schema.sql','/migrations.php','/installer-lib.php','/backup.php','/restore.php','/install','/install.php','/storage/private/installed.lock','/tools/migrate-service-credentials.php','/tools/local-db-create.php','/ui/app-context.php','/ui/app-navigation.php','/ui/app-shell.php','/probe.zip'] as $path) {
     $response = http_probe($base . $path);
     $ok = in_array($response['status'], [403,404], true);
     report_probe($ok, 'sensitive path ' . $path, 'HTTP ' . $response['status']);

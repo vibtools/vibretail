@@ -19,7 +19,7 @@ Options -Indexes
 
     # Block hidden/internal paths except ACME challenge validation.
     RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
-    RewriteRule ^(?:tools|migrations|storage/private)(?:/|$) - [F,L,NC]
+    RewriteRule ^(?:tools|migrations|storage/private|ui)(?:/|$) - [F,L,NC]
 </IfModule>
 
 <FilesMatch "^(?:error_log|config\.php|installer-lib\.php|migrations\.php|product-images\.php|schema\.sql|backup\.php|restore\.php|uat\.php|migrate-product-images\.php|aapanel-setup\.php|aapanel-nginx\.conf|htdocs\.rar)$|\.(?:sql|log|bak|ini|env|rar|conf|zip|7z|tar|gz|tgz)$">

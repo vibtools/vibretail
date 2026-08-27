@@ -13,3 +13,9 @@
 - Switched the application typography foundation to an Inter-first stack and 13px primary UI text while preserving all VibRetail theme colors.
 - Added opt-in `vr-*` compact card, button, form, table, badge, layout, focus, motion, and reduced-motion primitives for phased migration.
 - Added automated UI-foundation regression checks that protect the frozen VibRetail palette and the compact structural contract.
+
+### UI Shell Architecture
+- Centralized authenticated application context, canonical navigation and shared shell rendering under `src/ui/`.
+- Replaced 64 duplicated authenticated page shells with metadata-only route wrappers while preserving route filenames and page keys.
+- Preserved the existing shell DOM, `POS_CONFIG`, session/CSRF/auth-version behavior and current visual sizing for the UI-02A architecture gate.
+- Blocked direct HTTP access to internal `src/ui/` PHP source and added reusable-shell regression coverage.
