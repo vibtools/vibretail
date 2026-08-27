@@ -12,10 +12,78 @@
     --line: #e7eeeb;
     --surface: #ffffff;
     --canvas: #f5f8f7;
+
+    /* VibRetail UI-01 structural foundation. Theme/color values above are frozen. */
+    --vr-color-primary: var(--green);
+    --vr-color-primary-strong: var(--green-dark);
+    --vr-color-primary-soft: var(--green-soft);
+    --vr-color-info: var(--blue);
+    --vr-color-accent: var(--purple);
+    --vr-color-warning: var(--orange);
+    --vr-color-danger: var(--red);
+    --vr-color-teal: var(--teal);
+    --vr-text-primary: var(--ink);
+    --vr-text-muted: var(--muted);
+    --vr-border-default: var(--line);
+    --vr-bg-surface: var(--surface);
+    --vr-bg-app: var(--canvas);
+
+    --vr-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --vr-font-mono: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    --vr-text-xs: 11px;
+    --vr-text-sm: 12px;
+    --vr-text-base: 13px;
+    --vr-text-md: 14px;
+    --vr-text-lg: 16px;
+    --vr-text-xl: 20px;
+    --vr-weight-regular: 400;
+    --vr-weight-medium: 500;
+    --vr-weight-semibold: 600;
+    --vr-line-tight: 1.25;
+    --vr-line-compact: 1.35;
+    --vr-line-normal: 1.45;
+    --vr-line-relaxed: 1.55;
+
+    --vr-space-1: 2px;
+    --vr-space-2: 4px;
+    --vr-space-3: 6px;
+    --vr-space-4: 8px;
+    --vr-space-5: 10px;
+    --vr-space-6: 12px;
+    --vr-space-7: 16px;
+    --vr-space-8: 20px;
+    --vr-space-9: 24px;
+    --vr-space-10: 28px;
+    --vr-space-11: 32px;
+
+    --vr-radius-tiny: 3px;
+    --vr-radius-small: 6px;
+    --vr-radius-control: 8px;
+    --vr-radius-card: 12px;
+    --vr-radius-pill: 999px;
+    --vr-border-width: 1px;
+    --vr-elevation: none;
+
+    --vr-button-compact: 28px;
+    --vr-button-medium: 32px;
+    --vr-input-compact: 30px;
+    --vr-input-medium: 34px;
+    --vr-textarea-min: 64px;
+    --vr-sidebar-target: 196px;
+    --vr-topbar-target: 44px;
+    --vr-content-max: 1280px;
+    --vr-content-gutter: 16px;
+    --vr-grid-gap: 12px;
+
+    --vr-motion-fast: 100ms ease;
+    --vr-motion-normal: 120ms ease;
+    --vr-motion-slow: 150ms ease;
+
+    /* Legacy shell/elevation tokens remain active until UI-02/UI-03 migration. */
     --sidebar: 254px;
     --shadow: 0 12px 30px rgba(29, 62, 49, .08);
     --radius: 17px;
-    --font: Aptos, Candara, "Trebuchet MS", sans-serif;
+    --font: var(--vr-font-sans);
 }
 
 * { box-sizing: border-box; }
@@ -26,8 +94,8 @@ body {
     margin: 0;
     color: var(--ink);
     font-family: var(--font);
-    font-size: 14px;
-    line-height: 1.45;
+    font-size: var(--vr-text-base);
+    line-height: var(--vr-line-normal);
     -webkit-font-smoothing: antialiased;
 }
 
@@ -299,7 +367,7 @@ button { color: inherit; }
 .barcode-toolbar { display: flex; align-items: end; gap: 12px; margin-bottom: 20px; }.barcode-toolbar .form-field { flex: 1; }
 .barcode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 .barcode-label { padding: 17px 14px; border: 1px dashed #a9b7b1; border-radius: 9px; background: #fff; text-align: center; }
-.barcode-label h4 { margin: 0 0 8px; font-size: 12px; }.barcode-label p { margin: 8px 0 0; font-family: Consolas, monospace; font-size: 11px; letter-spacing: .08em; }
+.barcode-label h4 { margin: 0 0 8px; font-size: 12px; }.barcode-label p { margin: 8px 0 0; font-family: var(--vr-font-mono); font-size: 11px; letter-spacing: .08em; }
 .barcode-lines { height: 47px; background: repeating-linear-gradient(90deg, #121a17 0 2px, transparent 2px 4px, #121a17 4px 5px, transparent 5px 8px, #121a17 8px 11px, transparent 11px 13px); }
 .report-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }.report-tabs button { padding: 8px 13px; border: 1px solid var(--line); border-radius: 18px; background: #fff; cursor: pointer; }.report-tabs button.active { color: #fff; border-color: var(--green); background: var(--green); }
 .report-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }.report-metric { padding: 18px; border-radius: 14px; background: #fff; box-shadow: var(--shadow); }.report-metric small { color: var(--muted); }.report-metric strong { display: block; margin-top: 7px; font-size: 24px; letter-spacing: -.03em; }
@@ -453,3 +521,151 @@ button { color: inherit; }
     .license-grid { grid-template-columns: 1fr; }
     .license-card { padding: 23px; }
 }
+
+/* VibRetail UI-01 reusable compact foundation ---------------------------------
+   Structural reference: VibTools Web UI v2.1.2.
+   VibRetail theme/color values remain the source of truth.
+   These vr-* primitives are opt-in until UI-02+ migrates legacy components. */
+.vr-surface,
+.vr-card {
+    border: var(--vr-border-width) solid var(--vr-border-default);
+    border-radius: var(--vr-radius-card);
+    background: var(--vr-bg-surface);
+    box-shadow: var(--vr-elevation);
+}
+
+.vr-card__header,
+.vr-card__body,
+.vr-card__footer {
+    padding: var(--vr-space-5) var(--vr-space-6);
+}
+
+.vr-card__header {
+    border-bottom: var(--vr-border-width) solid var(--vr-border-default);
+}
+
+.vr-card__footer {
+    border-top: var(--vr-border-width) solid var(--vr-border-default);
+}
+
+.vr-title {
+    margin: 0;
+    color: var(--vr-text-primary);
+    font-size: var(--vr-text-md);
+    font-weight: var(--vr-weight-medium);
+    line-height: var(--vr-line-compact);
+}
+
+.vr-meta,
+.vr-help {
+    color: var(--vr-text-muted);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-regular);
+    line-height: var(--vr-line-normal);
+}
+
+.vr-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--vr-space-3);
+    min-height: var(--vr-button-compact);
+    padding: 0 var(--vr-space-5);
+    border: var(--vr-border-width) solid transparent;
+    border-radius: var(--vr-radius-control);
+    color: var(--vr-text-primary);
+    background: var(--vr-bg-surface);
+    box-shadow: none;
+    font-size: var(--vr-text-sm);
+    font-weight: var(--vr-weight-medium);
+    line-height: 1;
+    cursor: pointer;
+    transform: none;
+    transition: color var(--vr-motion-normal), background-color var(--vr-motion-normal), border-color var(--vr-motion-normal), opacity var(--vr-motion-normal);
+}
+
+.vr-btn--medium { min-height: var(--vr-button-medium); }
+.vr-btn--primary { color: var(--vr-bg-surface); border-color: var(--vr-color-primary); background: var(--vr-color-primary); }
+.vr-btn--secondary { border-color: var(--vr-border-default); background: var(--vr-bg-surface); }
+.vr-btn--ghost { border-color: transparent; background: transparent; }
+.vr-btn--danger { color: var(--vr-color-danger); border-color: var(--vr-color-danger); background: var(--vr-bg-surface); }
+.vr-btn:hover { transform: none; box-shadow: none; }
+.vr-btn--primary:hover { background: var(--vr-color-primary-strong); border-color: var(--vr-color-primary-strong); }
+.vr-btn--secondary:hover,
+.vr-btn--ghost:hover { background: var(--vr-color-primary-soft); }
+.vr-btn:disabled,
+.vr-btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; pointer-events: none; }
+
+.vr-input,
+.vr-select,
+.vr-textarea {
+    width: 100%;
+    min-height: var(--vr-input-compact);
+    padding: 0 var(--vr-space-4);
+    border: var(--vr-border-width) solid var(--vr-border-default);
+    border-radius: var(--vr-radius-control);
+    color: var(--vr-text-primary);
+    background: var(--vr-bg-surface);
+    box-shadow: none;
+    font: inherit;
+    font-size: var(--vr-text-sm);
+    outline: none;
+    transition: border-color var(--vr-motion-normal), background-color var(--vr-motion-normal), opacity var(--vr-motion-normal);
+}
+
+.vr-input--medium,
+.vr-select--medium { min-height: var(--vr-input-medium); }
+.vr-textarea { min-height: var(--vr-textarea-min); padding-block: var(--vr-space-3); resize: vertical; }
+.vr-input:focus,
+.vr-select:focus,
+.vr-textarea:focus { border-color: var(--vr-color-primary); box-shadow: none; }
+.vr-input:disabled,
+.vr-select:disabled,
+.vr-textarea:disabled { opacity: .55; cursor: not-allowed; }
+
+.vr-field { display: grid; gap: var(--vr-space-2); min-width: 0; }
+.vr-field > label { color: var(--vr-text-primary); font-size: var(--vr-text-xs); font-weight: var(--vr-weight-medium); }
+.vr-field__error { color: var(--vr-color-danger); font-size: var(--vr-text-xs); }
+
+.vr-table-wrap { width: 100%; overflow-x: auto; }
+.vr-table { width: 100%; border-collapse: collapse; color: var(--vr-text-primary); font-size: var(--vr-text-sm); white-space: nowrap; }
+.vr-table th { padding: var(--vr-space-3) var(--vr-space-6); border-bottom: var(--vr-border-width) solid var(--vr-border-default); font-size: var(--vr-text-xs); font-weight: var(--vr-weight-medium); text-align: left; }
+.vr-table td { padding: var(--vr-space-3) var(--vr-space-6); border-bottom: var(--vr-border-width) solid var(--vr-border-default); }
+.vr-table tbody tr { transition: background-color var(--vr-motion-fast); }
+.vr-table tbody tr:hover { background: var(--vr-color-primary-soft); }
+
+.vr-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 20px;
+    padding: 0 var(--vr-space-3);
+    border: var(--vr-border-width) solid var(--vr-border-default);
+    border-radius: var(--vr-radius-pill);
+    font-size: var(--vr-text-xs);
+    font-weight: var(--vr-weight-medium);
+    line-height: 1;
+}
+
+.vr-stack { display: grid; gap: var(--vr-grid-gap); }
+.vr-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vr-space-4); }
+.vr-page { width: min(calc(100% - (var(--vr-content-gutter) * 2)), var(--vr-content-max)); margin-inline: auto; }
+
+code,
+kbd,
+pre,
+samp { font-family: var(--vr-font-mono); }
+
+:where(.vr-btn, .vr-input, .vr-select, .vr-textarea, a, button):focus-visible {
+    outline: 2px solid var(--vr-color-primary);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
